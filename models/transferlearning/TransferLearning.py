@@ -10,33 +10,34 @@ class TransferLearning:
                  include_top: bool = True,
                  weights: str = "imagenet",
                  freeze: bool | int = False,
-                 use_only_few_layers: bool | int = False
+                 use_n_layers: bool | int = False
                  ) -> None:
         
         self.input_shape: tuple[int, int, int] = input_shape
         self.include_top: bool = include_top
         self.weights: str = weights
         self.freeze: bool | int = freeze
-        self.use_only_few_layers: bool | int = use_only_few_layers
+        self.use_n_layers: bool | int = use_n_layers
 
     def _dropLayers(self, model: Sequential) -> Sequential:
-        if type(self.use_only_few_layers) == int:
-            if self.use_only_few_layers == 0:
+        if type(self.use_n_layers) == int:
+            if self.use_n_layers == 0:
                 raise ValueError(
-                    "Attribute 'use_only_few_layers' can not be zero, must use at least 1 layer on Transfer Learning."
+                    "Attribute 'use_n_layers' can not be zero, must use at least 1 layer on Transfer Learning."
                 )
-            elif self.use_only_few_layers > len(model.layers):
+            elif self.use_n_layers > len(model.layers):
                 raise ValueError(
-                    f"Attribute 'use_only_few_layers' == {self.use_only_few_layers} is higher than the maximum number of layers {len(model.layers)}."
+                    f"Attribute 'use_n_layers' == {self.use_n_layers} is higher than the maximum number of layers {len(model.layers)}."
                 )
-        if self.use_only_few_layers == False: return model
+        if self.use_n_layers == False: return model
             
         new_model = Sequential()
         count = 0
         for layer in model.layers:
-            if count == self.use_only_few_layers:
+            if count == self.use_n_layers:
                 break
             new_model.add(layer)
+            count += 1
         
         return new_model
     
@@ -78,9 +79,9 @@ class TransferLearning:
         return self._freezeLayers(new_model)
 
     def transferResnet50(self) -> tuple[Functional, bool]:
-        if type(self.use_only_few_layers) == int:
+        if type(self.use_n_layers) == int:
             raise ValueError(
-                "ResNet can not have 'use_only_few_layers' attribute as int, use the default value (False)."
+                "ResNet can not have 'use_n_layers' attribute as int, use the default value (False)."
             )
         
         if self.include_top:
@@ -105,10 +106,10 @@ class TransferLearning:
     
     def transferMobileNet(self) -> tuple[keras.Model, bool]:
         num_layers = len(MobileNet(include_top=False).layers)
-        if type(self.use_only_few_layers) == int:
-            if int(self.use_only_few_layers) > num_layers:
+        if type(self.use_n_layers) == int:
+            if int(self.use_n_layers) > num_layers:
                 raise ValueError(
-                    f"Attribute 'use_only_few_layers' == {self.use_only_few_layers} is higher than the maximun number of layers {num_layers}."
+                    f"Attribute 'use_n_layers' == {self.use_n_layers} is higher than the maximun number of layers {num_layers}."
                 )
         if type(self.freeze) == int:
             if int(self.freeze) > num_layers:
@@ -131,10 +132,10 @@ class TransferLearning:
     
     def transferXception(self) -> tuple[keras.Model, bool]:
         num_layers = len(Xception(include_top=False).layers)
-        if type(self.use_only_few_layers) == int:
-            if int(self.use_only_few_layers) > num_layers:
+        if type(self.use_n_layers) == int:
+            if int(self.use_n_layers) > num_layers:
                 raise ValueError(
-                    f"Attribute 'use_only_few_layers' == {self.use_only_few_layers} is higher than the maximun number of layers {num_layers}."
+                    f"Attribute 'use_n_layers' == {self.use_n_layers} is higher than the maximun number of layers {num_layers}."
                 )
         if type(self.freeze) == int:
             if int(self.freeze) > num_layers:
@@ -157,10 +158,10 @@ class TransferLearning:
     
     def transferVGG16(self) -> tuple[keras.Model, bool]:
         num_layers = len(VGG16(include_top=False).layers)
-        if type(self.use_only_few_layers) == int:
-            if int(self.use_only_few_layers) > num_layers:
+        if type(self.use_n_layers) == int:
+            if int(self.use_n_layers) > num_layers:
                 raise ValueError(
-                    f"Attribute 'use_only_few_layers' == {self.use_only_few_layers} is higher than the maximun number of layers {num_layers}."
+                    f"Attribute 'use_n_layers' == {self.use_n_layers} is higher than the maximun number of layers {num_layers}."
                 )
         if type(self.freeze) == int:
             if int(self.freeze) > num_layers:
