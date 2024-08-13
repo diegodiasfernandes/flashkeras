@@ -1,10 +1,12 @@
-from transferlearning.TransferLearning import TransferLearning as ts
+from models.FlashSequential import FlashSequential
+from models.transferlearning.TransferLearning import TransferLearning
+from keras.layers import Dense, InputLayer
 
-t = ts((224, 224, 3), False)
+input_shape = (125, 125, 3)
 
-resnet = t.transferResnet50()
+flash = FlashSequential(input_shape)
+transfer = TransferLearning(input_shape, include_top=True, freeze=2)
 
-for layer in resnet.layers:
-    print(type(layer))
+flash.add(transfer.transferVGG16())
 
-resnet.summary()
+flash.summary()
