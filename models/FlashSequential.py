@@ -1,5 +1,7 @@
 from keras.models import Sequential # type: ignore
 from keras.layers import InputLayer # type: ignore
+from keras.optimizers import Adam # type: ignore
+from keras.preprocessing.image import DirectoryIterator # type: ignore
 import keras # type: ignore
 
 class FlashSequential:
@@ -60,3 +62,19 @@ class FlashSequential:
         self.model = keras.models.load_model(path_to_modelh5)
         self.blocked.append('Loaded Model: You have loaded a full model. To maintain integrity of the flash, any modifycations to the architecture are blocked.')
 
+    def _optimizerMap(self, opt: str, lr: float):
+        pass
+
+    def fit(self, 
+            train_batches=None, 
+            epochs: int = 1,
+            validation_data=None,
+            optimizer_lr: tuple[str, float] | str = "adam"
+            ):
+        opt = None
+        if type(optimizer_lr) == str:
+            opt = Adam() # think of something to use _optimizerMap
+        else:
+            opt = Adam(learning_rate=optimizer_lr)
+        self.model.compile(opt, )
+        self.model.fit(train_batches, )
