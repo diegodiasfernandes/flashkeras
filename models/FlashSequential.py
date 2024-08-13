@@ -58,4 +58,5 @@ class FlashSequential:
     def loadModel(self, path_to_modelh5: str):
         print("This will Overwrite an existent model.")
         self.model = keras.models.load_model(path_to_modelh5)
+        self.blocked.append('Loaded Model: You have loaded a full model. To maintain integrity of the flash, any modifycations to the architecture are blocked.')
 
