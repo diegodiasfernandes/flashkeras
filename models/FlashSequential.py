@@ -36,7 +36,7 @@ class FlashSequential:
                 network, is_full_model = layer
                 if is_full_model: 
                     self.model = network
-                    self.blocked.append('TransferLearning: Include Top was set. To maintain integrity of the flash, any modifycations to the architecture are blocked.\n')
+                    self.blocked.append('TransferLearning: Include Top was set. To maintain integrity of the flash, any modifycations to the architecture are blocked.')
                 elif type(network) == type(Sequential):
                     for l in network.layers:
                         self.model.add(l)
@@ -46,9 +46,9 @@ class FlashSequential:
             return False         
 
         if len(self.blocked) != 0:
-            err_message = ''
+            err_message = 'Possible errors:\n'
             for error in self.blocked:
-                err_message += error
+                err_message = err_message + error + '\n'
 
             raise ValueError(err_message)
 
