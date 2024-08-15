@@ -1,11 +1,14 @@
 from keras.preprocessing.image import ImageDataGenerator # type: ignore
 from keras.preprocessing.image import DirectoryIterator # type: ignore
 from utils.filesutils import *
+from typing import overload, Union, Tuple, Literal
+
+COLOR_MODE = Literal["rgb", "grayscale"]
 
 class FlashDataGenerator:
     def __init__(self,         
                     img_size: int,
-                    color_mode: str = "rgb",
+                    color_mode: COLOR_MODE = "rgb",
                     horizontal_flip: bool = False,
                     rotation_range: int = 0,
                     zoom_range: float = 0,
@@ -13,13 +16,13 @@ class FlashDataGenerator:
                     fill_mode: str = "nearest"
                 ) -> None:
     
-        self.img_size: int = img_size
-        self.color_mode: str = color_mode
-        self.horizontal_flip: bool = horizontal_flip
-        self.rotation_range: int = rotation_range
-        self.zoom_range: float = zoom_range
-        self.brightness_range: tuple[float, float] | None = brightness_range
-        self.fill_mode: str = fill_mode
+        self.img_size = img_size
+        self.color_mode = color_mode
+        self.horizontal_flip = horizontal_flip
+        self.rotation_range = rotation_range
+        self.zoom_range = zoom_range
+        self.brightness_range = brightness_range
+        self.fill_mode = fill_mode
 
     def _getClassMode(self, path_or_class_list: str | list[str]):
         num_classes: int = 0
