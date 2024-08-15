@@ -4,7 +4,7 @@ from keras.models import Sequential # type: ignore
 import numpy as np # type: ignore
 import keras # type: ignore
 
-class TransferLearning:
+class FlashTransferLearning:
     def __init__(self,
                  input_shape: tuple[int, int, int] = (-1,-1,-1),
                  include_top: bool = True,

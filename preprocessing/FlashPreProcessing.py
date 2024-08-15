@@ -1,3 +1,4 @@
+import cv2
 from keras.models import Sequential # type: ignore
 from keras.layers import InputLayer # type: ignore
 from keras.optimizers import Adam # type: ignore
@@ -59,3 +60,18 @@ class FlashPreProcessing:
             new_y = new_y.values  # Convert Series to NumPy array
         
         return new_x, new_y
+    
+    @staticmethod
+    def reshapeNumpyImages(x: np.ndarray, 
+                           input_shape: tuple[int, int, int] = (224, 224, 3)
+                           ) -> np.ndarray:
+        new_x = x
+        new_x = np.expand_dims(new_x, axis=-1)  # Transforma (60000, 28, 28) em (60000, 28, 28, 1)
+
+        new_x_resized = np.zeros((new_x.shape[0], input_shape[0], input_shape[1], input_shape[2]), dtype=np.float32)
+
+        for i in range(new_x.shape[0]):
+            resized_img = cv2.resize(new_x[i], (input_shape[1], input_shape[0]))  # Redimensiona para (224, 224)
+            new_x_resized[i] = np.repeat(resized_img, input_shape[2], axis=-1)  # Converte para (224, 224, 3)
+        
+        return new_x_resized

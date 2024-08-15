@@ -2,6 +2,7 @@ import os
 import matplotlib.image as mpimg
 from keras.preprocessing.image import DirectoryIterator
 import matplotlib.pyplot as plt
+import numpy as np
 
 def show_images_from_batch(batches: DirectoryIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
     all_images = []
@@ -21,6 +22,18 @@ def show_images_from_batch(batches: DirectoryIterator, num_images: int = 1, fig_
         plt.imshow(all_images[i])
         plt.axis('off')
     
+    plt.show()
+
+def show_images_nparray(images: np.ndarray, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
+    num_images = min(num_images, len(images))
+
+    plt.figure(figsize=fig_size)
+    
+    for i in range(num_images):
+        plt.subplot(1, num_images, i+1)
+        plt.imshow(images[i])
+        plt.axis('off')  # Remove os eixos
+
     plt.show()
 
 def show_images_from_directory(dir_path: str, num_images=1):

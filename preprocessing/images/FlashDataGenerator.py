@@ -3,12 +3,10 @@ from keras.preprocessing.image import DirectoryIterator # type: ignore
 from utils.filesutils import *
 from typing import overload, Union, Tuple, Literal
 
-COLOR_MODE = Literal["rgb", "grayscale"]
-
 class FlashDataGenerator:
     def __init__(self,         
                     img_size: int,
-                    color_mode: COLOR_MODE = "rgb",
+                    color_mode: Literal["rgb", "grayscale"] = "rgb",
                     horizontal_flip: bool = False,
                     rotation_range: int = 0,
                     zoom_range: float = 0,
