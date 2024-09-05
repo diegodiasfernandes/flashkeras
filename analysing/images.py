@@ -29,7 +29,15 @@ def show_images_nparray(images: np.ndarray, num_images: int = 1, fig_size: tuple
     for i in range(num_images):
         plt.subplot(1, num_images, i+1)
         plt.imshow(images[i])
-        plt.axis('off')  # Remove os eixos
+        plt.axis('off')
+
+    plt.show()
+
+def show_image_nparray(image: np.ndarray, fig_size: tuple[int, int] = (7,7)):
+    plt.figure(figsize=fig_size)
+    
+    plt.imshow(image)
+    plt.axis('off')
 
     plt.show()
 
