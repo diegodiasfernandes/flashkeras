@@ -31,12 +31,14 @@ So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'e
 ### flashkeras.models
 #### FlashSequential
 - Easier to use Sequential model.
-    Usage example:  
-        flash = FlashSequential()
-        flash.addDense(32, "relu")
-        flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test))
 
-    TIP: Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can use flash.getSequential() and continue from there!
+Usage example:  
+```py
+flash = FlashSequential()
+flash.addDense(32, "relu")
+flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test))
+```
+TIP: Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can use flash.getSequential() and continue from there!
 
 #### transferlearning.FlashTransferLearning
 - How many layers you want from a network
