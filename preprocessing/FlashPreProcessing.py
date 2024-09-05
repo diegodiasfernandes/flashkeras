@@ -4,11 +4,29 @@ from keras.layers import InputLayer # type: ignore
 from keras.optimizers import Adam # type: ignore
 from keras.preprocessing.image import DirectoryIterator # type: ignore
 import keras # type: ignore
-from typing import overload, Union, Tuple, Literal
+from  utils.typehints import *
 import numpy as np
 import pandas as pd
 
 class FlashPreProcessing:
+
+    @staticmethod
+    def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator]) -> tuple:
+                    
+            if isinstance(data, DirectoryIterator):
+                return (data.target_size[0], data.target_size[1], 3)
+
+            if ((isinstance(data, np.ndarray) and data.ndim < 3) or isinstance(data, pd.DataFrame)):
+                temp_data = data
+                temp_data = pd.DataFrame(temp_data)
+                return (temp_data.shape[1], )
+            
+            else:
+                shape = data[0].shape
+                if len(shape) == 2: 
+                    return (shape[0], shape[1], 1)
+                else: 
+                    return (shape[0], shape[1], 3)   
 
     @staticmethod
     def ensureOneHotEncoding(
@@ -45,7 +63,7 @@ class FlashPreProcessing:
         return new_y
     
     @staticmethod
-    def adjustXY(
+    def datasetToArray(
             x: Union[np.ndarray, pd.DataFrame, None] = None, 
             y: Union[np.ndarray, pd.Series, None] = None
             ) -> tuple[Union[np.ndarray, pd.DataFrame, None], Union[np.ndarray, pd.Series, None]]:
@@ -62,16 +80,22 @@ class FlashPreProcessing:
         return new_x, new_y
     
     @staticmethod
-    def reshapeNumpyImages(x: np.ndarray, 
-                           input_shape: tuple[int, int, int] = (224, 224, 3)
-                           ) -> np.ndarray:
-        new_x = x
-        new_x = np.expand_dims(new_x, axis=-1)  # Transforma (60000, 28, 28) em (60000, 28, 28, 1)
+    def convertNdArrayToRGB(images: np.ndarray) -> np.ndarray:
+        """
+            Convert a batch of grayscale images (shape: (num_images, height, width) or 
+            (num_images, height, width, 1)) into RGB format (shape: (num_images, height, width, 3)).
+            
+            Parameters:
+            images: np.ndarray, Input image batch of shape (num_images, height, width) or 
+                    (num_images, height, width, 1)
+            
+            Returns:
+            np.ndarray, A batch of images with shape (num_images, height, width, 3).
+        """
 
-        new_x_resized = np.zeros((new_x.shape[0], input_shape[0], input_shape[1], input_shape[2]), dtype=np.float32)
-
-        for i in range(new_x.shape[0]):
-            resized_img = cv2.resize(new_x[i], (input_shape[1], input_shape[0]))  # Redimensiona para (224, 224)
-            new_x_resized[i] = np.repeat(resized_img, input_shape[2], axis=-1)  # Converte para (224, 224, 3)
+        if len(images.shape) == 3:
+            images = np.expand_dims(images, axis=-1) 
         
-        return new_x_resized
+        rgb_images = np.repeat(images, 3, axis=-1)
+        
+        return rgb_images

@@ -3,8 +3,18 @@ from keras.src.engine.functional import Functional # type: ignore
 from keras.models import Sequential # type: ignore
 import numpy as np # type: ignore
 import keras # type: ignore
+from utils.typehints import *
+
+class FlashNet:
+    def __init__(self, 
+                    network: Union[Sequential, Functional],
+                    isFullNetwork: bool
+                    ) -> None:
+        self.network = network
+        self.isFullNetwork: bool = isFullNetwork
 
 class FlashTransferLearning:
+
     def __init__(self,
                  input_shape: tuple[int, int, int] = (-1,-1,-1),
                  include_top: bool = True,
@@ -83,7 +93,7 @@ class FlashTransferLearning:
         
         return self._freezeLayers(new_model)
 
-    def transferResnet50(self) -> tuple[Functional, bool]:
+    def transferResnet50(self) -> FlashNet:
         if type(self.use_only_n_layers) == int:
             raise ValueError(
                 "ResNet can not have 'use_only_n_layers' attribute as int, use the default value (False)."
@@ -92,7 +102,7 @@ class FlashTransferLearning:
         if self.include_top:
             print("WARNING: Include top == True. You can not modify this FlashKeras until the flash.clearFlash() method is called.")
             model = self._freezeLayers(ResNet50(include_top=self.include_top,weights=self.weights))
-            return model, True
+            return FlashNet(model, True)
         
         feature_extractor = ResNet50(
             include_top=self.include_top,
@@ -107,9 +117,9 @@ class FlashTransferLearning:
             for layer in feature_extractor.layers[:self.freeze]:
                 layer.trainable = False
 
-        return feature_extractor, False
+        return FlashNet(feature_extractor, False)
     
-    def transferMobileNet(self) -> tuple[keras.Model, bool]:
+    def transferMobileNet(self) -> FlashNet:
         num_layers = len(MobileNet(include_top=False).layers)
         if type(self.use_only_n_layers) == int:
             if int(self.use_only_n_layers) > num_layers:
@@ -125,7 +135,7 @@ class FlashTransferLearning:
         if self.include_top:
             print("WARNING: Include top == True. You can not modify this FlashKeras until the flash.clearModel() method is called.")
             model = MobileNet(include_top=self.include_top,weights=self.weights)
-            return self._freezeLayers(model), True
+            return FlashNet(self._freezeLayers(model), True)
         
         feature_extractor = MobileNet(
             include_top=False,
@@ -133,9 +143,9 @@ class FlashTransferLearning:
             input_shape=self.input_shape
         )
 
-        return self._freezeLayers(feature_extractor), False
+        return FlashNet(self._freezeLayers(feature_extractor), False)
     
-    def transferXception(self) -> tuple[keras.Model, bool]:
+    def transferXception(self) -> FlashNet:
         num_layers = len(Xception(include_top=False).layers)
         if type(self.use_only_n_layers) == int:
             if int(self.use_only_n_layers) > num_layers:
@@ -151,7 +161,7 @@ class FlashTransferLearning:
         if self.include_top:
             print("WARNING: Include top == True. You can not modify this FlashKeras until the flash.clearModel() method is called.")
             model = Xception(include_top=self.include_top,weights=self.weights)
-            return self._freezeLayers(model), True
+            return FlashNet(self._freezeLayers(model), True)
         
         feature_extractor = Xception(
             include_top=False,
@@ -159,9 +169,9 @@ class FlashTransferLearning:
             input_shape=self.input_shape
         )
 
-        return self._freezeLayers(feature_extractor), False
+        return FlashNet(self._freezeLayers(feature_extractor), False)
     
-    def transferVGG16(self) -> tuple[keras.Model, bool]:
+    def transferVGG16(self) -> FlashNet:
         num_layers = len(VGG16(include_top=False).layers)
         if type(self.use_only_n_layers) == int:
             if int(self.use_only_n_layers) > num_layers:
@@ -177,7 +187,7 @@ class FlashTransferLearning:
         if self.include_top:
             print("WARNING: Include top == True. You can not modify this FlashKeras until the flash.clearModel() method is called.")
             model = VGG16(include_top=self.include_top,weights=self.weights)
-            return self._freezeLayers(model), True
+            return FlashNet(self._freezeLayers(model), True)
         
         feature_extractor = VGG16(
             include_top=False,
@@ -185,5 +195,5 @@ class FlashTransferLearning:
             input_shape=self.input_shape
         )
 
-        return self._freezeLayers(feature_extractor), False
+        return FlashNet(self._freezeLayers(feature_extractor), False)
 
