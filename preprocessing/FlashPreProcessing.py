@@ -27,7 +27,7 @@ class FlashPreProcessing:
     @staticmethod
     def ensureOneHotEncoding(
                 y: Union[np.ndarray, pd.Series]
-                ):
+                ) -> np.ndarray:
         
         if isinstance(y, np.ndarray):
             y = pd.Series(y)
