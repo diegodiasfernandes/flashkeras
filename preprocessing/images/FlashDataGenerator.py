@@ -2,6 +2,7 @@ from utils.otherimports import *
 from utils.kerasimports import *
 from utils.typehints import *
 from utils.filesutils import count_directories_in_directory
+from preprocessing.FlashPreProcessing import FlashPreProcessing as prepro
 
 class FlashDataGenerator:
     def __init__(self,         
@@ -38,6 +39,58 @@ class FlashDataGenerator:
             raise ValueError ("Invalid number of classes!.")
 
         return class_mode
+
+    def flow_classes_from_nparray(self, 
+                                  x: np.ndarray, 
+                                  y: np.ndarray,
+                                  batch_size: int = 32
+                                  ) -> NumpyArrayIterator:
+        
+        data_gen = ImageDataGenerator(
+                    rescale=1./255,
+                    horizontal_flip=self.horizontal_flip,
+                    rotation_range=self.rotation_range,
+                    zoom_range=self.zoom_range,
+                    brightness_range=self.brightness_range,
+                    fill_mode=self.fill_mode
+                )
+        
+        x = prepro.convertNdArrayToRGB(x)
+        x = prepro.resizeNpArray(x, self.img_size, self.img_size)
+
+        y = prepro.ensureOneHotEncoding(y)
+        
+        batches = data_gen.flow(x, y, batch_size, shuffle=True)
+
+        return batches
+    
+    def flow_classes_from_nparray_test_split(self, 
+                                  x: np.ndarray, 
+                                  y: np.ndarray,
+                                  test_split: float = 0.2,
+                                  batch_size: int = 32
+                                  ) -> tuple[NumpyArrayIterator, NumpyArrayIterator]:
+        
+        data_gen = ImageDataGenerator(
+                    rescale=1./255,
+                    validation_split=test_split,
+                    horizontal_flip=self.horizontal_flip,
+                    rotation_range=self.rotation_range,
+                    zoom_range=self.zoom_range,
+                    brightness_range=self.brightness_range,
+                    fill_mode=self.fill_mode
+                )
+        
+        x = prepro.convertNdArrayToRGB(x)
+        x = prepro.resizeNpArray(x, self.img_size, self.img_size)
+        
+        y = prepro.ensureOneHotEncoding(y)
+        
+        train_batches = data_gen.flow(x, y, batch_size, subset='training', shuffle=True)
+
+        test_batches = data_gen.flow(x, y, batch_size, subset='validation', shuffle=True)
+
+        return (train_batches, test_batches) 
 
     def flow_all_classes_from_dir(
             self,

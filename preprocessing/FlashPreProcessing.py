@@ -1,6 +1,6 @@
 from utils.otherimports import *
 from utils.kerasimports import *
-from  utils.typehints import *
+from utils.typehints import *
 
 class FlashPreProcessing:
 
@@ -73,6 +73,10 @@ class FlashPreProcessing:
         
         return new_x, new_y
     
+    @staticmethod
+    def resizeNpArray(array: np.ndarray, new_size1: int, new_size2: int) -> np.ndarray:
+        return tf.image.resize(array, (new_size1, new_size2)).numpy()
+
     @staticmethod
     def convertNdArrayToRGB(images: np.ndarray) -> np.ndarray:
         """
