@@ -13,7 +13,7 @@ Usage example:
 
 # preprocessing
 flash_gen = FlashDataGenerator (
-    img_size=32, # resizing
+    img_size=224, # resizing
     rotation_range=10 # rotating
 )
 
@@ -27,8 +27,13 @@ flash_transfer = FlashTransferLearning(
     freeze=2, 
     use_only_n_layers=7    
 )
+mobilenet = flash_transfer.transferMobileNet()
 
+# create model with FlashSequential and add the transferlearning
 flash = FlashSequential()
+
+flash.addTransferLearning(mobilenet)
+flash.add(keras.layers.Flatten())
 flash.addDense(64, "relu")
 flash.addDense(32, "elu")
 flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
