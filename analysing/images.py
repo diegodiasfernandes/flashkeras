@@ -1,6 +1,6 @@
 import os
-import matplotlib.image as mpimg
-from keras.preprocessing.image import DirectoryIterator
+import matplotlib.image as mpimg # type: ignore
+from keras.preprocessing.image import DirectoryIterator # type: ignore
 import matplotlib.pyplot as plt
 import numpy as np
 

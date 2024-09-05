@@ -4,9 +4,9 @@ from keras.optimizers import Adam # type: ignore
 from keras.preprocessing.image import DirectoryIterator # type: ignore
 from preprocessing.FlashPreProcessing import FlashPreProcessing as preprocess
 import keras # type: ignore
-from typing import overload, Union, Tuple
+from typing import overload, Union, Tuple, Any
 import numpy as np
-import pandas as pd
+import pandas as pd # type: ignore
 
 class FlashSequential:
     def __init__(self, input_shape: tuple[int, int, int]) -> None:
@@ -20,28 +20,30 @@ class FlashSequential:
         return model
     
     @overload
-    def getInputShape(self, x: np.ndarray | None = None) -> tuple: ...
+    def getInputShape(self, data: np.ndarray | None = None) -> tuple: ...
     @overload
-    def getInputShape(self, image_batches: DirectoryIterator | None = None) -> tuple: ...
+    def getInputShape(self, data: DirectoryIterator | None = None) -> tuple: ...
 
     def getInputShape(self,
-                      x: Union[np.ndarray, pd.DataFrame, None] = None, 
-                      image_batches: Union[DirectoryIterator, None] = None
+                      data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, None] = None
                       ) -> tuple:
             
-            input_shape = (1, 1, 1)
-            if image_batches is not None:
-                input_shape = (image_batches.target_size[0], image_batches.target_size[1], 3)
-            elif (isinstance(x, np.ndarray) or isinstance(x, pd.DataFrame)) and x.ndim < 3:
-                temp_x = x
-                temp_x = pd.DataFrame(temp_x)
-                input_shape = (temp_x.shape[1], )
-            elif isinstance(x, np.ndarray) and x.ndim >= 3:
-                shape = x[0].shape
+            if data is None:
+                raise ValueError("parameter should be of types: (pd.DataFrame or np.ndarray or DirectoryIterator)")
+            
+            input_shape: tuple[int, int, int] | tuple[int] = (1, 1, 1)
+
+            if isinstance(data, DirectoryIterator):
+                input_shape = (data.target_size[0], data.target_size[1], 3)
+
+            elif (isinstance(data, np.ndarray) or isinstance(data, pd.DataFrame)) and data.ndim < 3:
+                temp_data = data
+                temp_data = pd.DataFrame(temp_data)
+                input_shape = (temp_data.shape[1], )
+            elif isinstance(data, np.ndarray) and data.ndim >= 3:
+                shape = data[0].shape
                 if len(shape) == 2: input_shape = (shape[0], shape[1], 1)
-                else: input_shape = (shape[0], shape[1], 3)
-            else:
-                raise ValueError("at least one of image_batches or x must be of types: (pd.DataFrame or np.ndarray or DirectoryIterator)")
+                else: input_shape = (shape[0], shape[1], 3)                
             
             return input_shape
 
@@ -140,48 +142,57 @@ class FlashSequential:
 
     @overload
     def fit(self, 
-            x: np.ndarray | None = None, 
-            y: np.ndarray | None = None, 
-            epochs: int = 10,
-            optimizer: str = "adam",
-            learning_rate: float = 0.001,
-            metrics: list = ['accuracy'],
+            *, 
+            x: np.ndarray, 
+            y: np.ndarray, 
+            epochs: int = 10, 
+            optimizer: str = "adam", 
+            learning_rate: float = 0.001, 
+            metrics: list = ['accuracy'], 
             steps_per_epoch: int | None = None,
-            validation_data: Union[tuple[np.ndarray, np.ndarray], None] = None
-            ) -> None: ...
-    @overload
-    def fit(self, 
-            x: pd.DataFrame | None = None, 
-            y: pd.Series | None = None, 
-            epochs: int = 10,
-            optimizer: str = "adam",
-            learning_rate: float = 0.001,
-            metrics: list = ['accuracy'],
-            steps_per_epoch: int | None = None,
-            validation_data: Union[tuple[pd.DataFrame, pd.Series], None] = None
-            ) -> None: ...
-    @overload
-    def fit(self, 
-            train_batches: DirectoryIterator | None = None, 
-            epochs: int = 10,
-            optimizer: str = "adam",
-            learning_rate: float = 0.001,
-            metrics: list = ['accuracy'],
-            steps_per_epoch: int | None = None,
-            validation_data: Union[DirectoryIterator, None] = None
+            validation_data: tuple[np.ndarray, np.ndarray] | None = None
             ) -> None: ...
 
-    def fit(self,
+    @overload
+    def fit(self, 
+            *, 
+            x: pd.DataFrame, 
+            y: pd.Series, 
+            epochs: int = 10, 
+            optimizer: str = "adam", 
+            learning_rate: float = 0.001, 
+            metrics: list = ['accuracy'], 
+            steps_per_epoch: int | None = None, 
+            validation_data: tuple[pd.DataFrame, pd.Series] | None = None
+            ) -> None: ...
+
+    @overload
+    def fit(self, 
+            *, 
+            train_batches: DirectoryIterator, 
+            epochs: int = 10, 
+            optimizer: str = "adam", 
+            learning_rate: float = 0.001, 
+            metrics: list = ['accuracy'], 
+            steps_per_epoch: int | None = None, 
+            validation_data: DirectoryIterator | None = None
+            ) -> None: ...
+
+    def fit(self, 
+            *, 
             x: Union[np.ndarray, pd.DataFrame, None] = None, 
             y: Union[np.ndarray, pd.Series, None] = None, 
             train_batches: Union[DirectoryIterator, None] = None, 
-            epochs: int = 10,
-            validation_data: Union[DirectoryIterator, tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]], None] = None,
-            optimizer: str = "adam",
-            learning_rate: float = 0.001,
-            metrics: list = ['accuracy'],
+            epochs: int = 10, 
+            validation_data: Union[DirectoryIterator, tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]], None] = None, 
+            optimizer: str = "adam", 
+            learning_rate: float = 0.001, 
+            metrics: list = ['accuracy'], 
             steps_per_epoch: int | None = None 
             ) -> None:
+
+        if train_batches is not None and (x is not None or y is not None):
+            raise ValueError("Cannot specify both `train_batches` and `x`/`y`.")
         
         self._setOutputConfigs(
             opt = (optimizer, learning_rate), 
@@ -191,11 +202,17 @@ class FlashSequential:
             train_batches=train_batches
         )
 
-        if train_batches is not None:
-            self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
+        if train_batches is not None and isinstance(train_batches, DirectoryIterator):
+            self.model.fit(train_batches=train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
             return
+        
+        if x is None or y is None:
+            raise ValueError("`x` and `y` must be provided unless using `train_batches`.")
+        
+        if not ( (isinstance(x, pd.DataFrame) and isinstance(y, pd.Series)) or (isinstance(x, np.ndarray) and isinstance(y, np.ndarray)) ):
+            raise ValueError("`x` and `y` must be one of (`DataFrame` and `Series`) or (`ndarray` and `ndarray`).")
         
         x, y = preprocess.adjustXY(x, y)
 
-        self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
+        self.model.fit(x=x, y=y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
 

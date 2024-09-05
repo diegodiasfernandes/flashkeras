@@ -13,7 +13,7 @@ class FlashPreProcessing:
     @staticmethod
     def ensureOneHotEncoding(
                 y: Union[np.ndarray, pd.Series, None] = None
-                ) -> Tuple[str, str, int, Union[np.ndarray, pd.Series, None]]:
+                ) -> Union[np.ndarray, pd.Series, None]:
         
         new_y = y
         
@@ -57,7 +57,7 @@ class FlashPreProcessing:
             new_x = new_x.values  # Convert DataFrame to NumPy array
 
         if isinstance(new_y, pd.Series):
-            new_y = new_y.values  # Convert Series to NumPy array
+            new_y = new_y.to_numpy()  # Convert Series to NumPy array
         
         return new_x, new_y
     
