@@ -13,8 +13,14 @@ FlashKeras is based on a basic machine learning pipeline, that being:
 So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'evaluation'.
 
 ### analysing
+- Plotting images and Graphs
+- Matrixes
 
-## FlashSequential
-This should be able to initialize a model with some parameters being auto-generated. i.e. output layer activation and number of neurons, input shape, and so on...
+### preprocessing
+#### Class FlashPreProcessing
+- One-Hot-Encode
+- Converting and reshaping
 
-## FlashDataGenerator
+#### preprocessing.images.FlashDatGenerator
+- Collect images from directory
+- Filters
