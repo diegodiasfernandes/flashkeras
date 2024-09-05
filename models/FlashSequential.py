@@ -200,6 +200,7 @@ class FlashSequential:
             self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
             return
         
-        x, y = preprocess.datasetToArray(x, y)
+        if x is not None and y is not None:
+            x, y = preprocess.datasetToArray(x, y)
 
-        self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
+            self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)

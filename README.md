@@ -3,6 +3,37 @@ keras is one of the best machine learning libraries, but it is super Dense *haha
 
 Also, since often keras is not used by itself, flashkeras uses also: scikit-learn, pandas, numpy, matplotlib, ...
 
+## Basic Example
+
+Usage example:  
+```py
+
+# loading data
+(x_train, y_train), (x_test, y_test) = load_mnist_dataset()
+
+# preprocessing
+flash_gen = FlashDataGenerator (
+    img_size=32, # resizing
+    rotation_range=10 # rotating
+)
+
+train_batches = flash_gen.flow_classes_from_nparray(x_train, y_train)
+test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
+
+# transfer learning from MobileNet
+flash_transfer = FlashTransferLearning(
+    input_shape=(224, 224, 3),
+    include_top=False, 
+    freeze=2, 
+    use_only_n_layers=7    
+)
+
+flash = FlashSequential()
+flash.addDense(64, "relu")
+flash.addDense(32, "elu")
+flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
+```
+
 ## Basic Pipeline and Sub-Divisions
 FlashKeras is based on a basic machine learning pipeline, that being:
 - Data Analysis
@@ -32,13 +63,19 @@ So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'e
 #### FlashSequential
 - Easier to use Sequential model.
 
-Usage example:  
+Example:  
 ```py
 flash = FlashSequential()
 flash.addDense(32, "relu")
 flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test))
 ```
-TIP: Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can use flash.getSequential() and continue from there!
+*What's new???* there is no need to (besides possible...):
+- Give the input_shape
+- Create the output layer
+- Set the Optimizer
+- And many more
+
+**TIP:** Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can use flash.getSequential() and continue from there!
 
 #### transferlearning.FlashTransferLearning
 - How many layers you want from a network
