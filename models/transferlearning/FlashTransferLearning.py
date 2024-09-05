@@ -1,8 +1,5 @@
-from keras.applications import MobileNet, ResNet50, Xception, VGG16 # type: ignore
-from keras.src.engine.functional import Functional # type: ignore
-from keras.models import Sequential # type: ignore
-import numpy as np # type: ignore
-import keras # type: ignore
+from utils.otherimports import *
+from utils.kerasimports import *
 from utils.typehints import *
 
 class FlashNet:

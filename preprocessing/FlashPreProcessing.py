@@ -1,12 +1,6 @@
-import cv2
-from keras.models import Sequential # type: ignore
-from keras.layers import InputLayer # type: ignore
-from keras.optimizers import Adam # type: ignore
-from keras.preprocessing.image import DirectoryIterator # type: ignore
-import keras # type: ignore
+from utils.otherimports import *
+from utils.kerasimports import *
 from  utils.typehints import *
-import numpy as np
-import pandas as pd
 
 class FlashPreProcessing:
 

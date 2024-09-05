@@ -1,5 +1,4 @@
-from keras.models import Sequential
-from keras.layers import Dense, Conv2D, Flatten, MaxPooling2D
+from utils.kerasimports import Sequential
 
 def print_model_summary(model: Sequential):
     # Header

@@ -1,14 +1,9 @@
-from keras.models import Sequential # type: ignore
-from keras.layers import InputLayer, Dense # type: ignore
-from keras.optimizers import Adam, Nadam, SGD # type: ignore
-from keras.preprocessing.image import DirectoryIterator # type: ignore
 from preprocessing.FlashPreProcessing import FlashPreProcessing as preprocess
 from models.transferlearning.FlashTransferLearning import FlashNet
 from analysing.models import print_model_summary
-import keras # type: ignore
+from utils.otherimports import *
+from utils.kerasimports import *
 from utils.typehints import *
-import numpy as np
-import pandas as pd # type: ignore
 
 class FlashSequential:
     def __init__(self) -> None:

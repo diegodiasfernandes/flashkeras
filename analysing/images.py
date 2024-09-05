@@ -1,8 +1,5 @@
-import os
-import matplotlib.image as mpimg # type: ignore
-from keras.preprocessing.image import DirectoryIterator # type: ignore
-import matplotlib.pyplot as plt
-import numpy as np
+from utils.kerasimports import *
+from utils.otherimports import *
 
 def show_images_from_batch(batches: DirectoryIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
     all_images = []
