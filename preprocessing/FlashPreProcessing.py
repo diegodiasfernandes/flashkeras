@@ -28,12 +28,8 @@ class FlashPreProcessing:
     def ensureOneHotEncoding(
                 y: Union[np.ndarray, pd.Series]
                 ) -> np.ndarray:
-        
-        if isinstance(y, np.ndarray):
-            y = pd.Series(y)
-            return pd.get_dummies(y).values
-        
-        return pd.get_dummies(y).values
+
+        return to_categorical(y)
     
     @staticmethod
     def datasetToArray(
