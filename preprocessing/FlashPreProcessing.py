@@ -28,6 +28,10 @@ class FlashPreProcessing:
     def ensureOneHotEncoding(
                 y: Union[np.ndarray, pd.Series]
                 ) -> np.ndarray:
+        
+        if isinstance(y, pd.Series):
+            arr = y.astype('category').cat.codes
+            return to_categorical(arr)
 
         return to_categorical(y)
     
