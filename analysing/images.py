@@ -1,7 +1,7 @@
 from utils.kerasimports import *
 from utils.otherimports import *
 
-def show_images_from_batch(batches: DirectoryIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
+def show_images_from_batch(batches: DirectoryIterator | NumpyArrayIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
     all_images = []
     images, labels = (None, None)
     while True:

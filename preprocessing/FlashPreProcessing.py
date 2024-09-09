@@ -54,7 +54,11 @@ class FlashPreProcessing:
     
     @staticmethod
     def resizeNpArray(array: np.ndarray, new_size1: int, new_size2: int) -> np.ndarray:
-        return tf.image.resize(array, (new_size1, new_size2)).numpy()
+        if len(array.shape) == 3:
+            array = np.expand_dims(array, axis=-1)
+        resized_array = tf.image.resize(array, (new_size1, new_size2)).numpy()
+        
+        return resized_array
 
     @staticmethod
     def convertNdArrayToRGB(images: np.ndarray) -> np.ndarray:
