@@ -4,4 +4,4 @@ import cv2 # type: ignore
 import matplotlib.pyplot as plt # type: ignore
 import os # type: ignore
 import matplotlib.image as mpimg # type: ignore
-from sklearn.preprocessing import MinMaxScaler# type: ignore
+from sklearn.preprocessing import MinMaxScaler # type: ignore

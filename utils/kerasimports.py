@@ -1,4 +1,4 @@
-from keras.preprocessing.image import ImageDataGenerator, DirectoryIterator, NumpyArrayIterator # type: ignore
+from keras.preprocessing.image import ImageDataGenerator # type: ignore
 from keras.models import Sequential # type: ignore
 from keras.layers import InputLayer, Dense # type: ignore
 from keras.optimizers import Adam, Nadam, SGD # type: ignore

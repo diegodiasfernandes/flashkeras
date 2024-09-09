@@ -83,7 +83,7 @@ class FlashSequential:
         
     def setOutputParams(self,
                 y: Union[np.ndarray, pd.Series, None] = None, 
-                image_batches: Union[DirectoryIterator, NumpyArrayIterator, None] = None, 
+                image_batches: Optional[BatchIterator] = None, 
                 ) -> Tuple[str, str, int]:
         
         if y is not None:
@@ -156,26 +156,26 @@ class FlashSequential:
     @overload
     def fit(self, 
             *, 
-            train_batches: DirectoryIterator, 
+            train_batches: BatchIterator, 
             epochs: int = 10, 
             steps_per_epoch: int | None = None, 
-            validation_data: DirectoryIterator | None = None
+            validation_data: BatchIterator | None = None
             ) -> None: ...
 
     def fit(self, 
             *, 
             x: Union[np.ndarray, pd.DataFrame, None] = None, 
             y: Union[np.ndarray, pd.Series, None] = None, 
-            train_batches: Union[DirectoryIterator, NumpyArrayIterator, None] = None, 
+            train_batches: Optional[BatchIterator] = None, 
             epochs: int = 10, 
-            validation_data: Union[DirectoryIterator, NumpyArrayIterator, tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]], None] = None, 
+            validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame] | Union[np.ndarray, pd.Series]]] = None, 
             steps_per_epoch: int | None = None 
             ) -> None:
 
         if train_batches is not None:
             if x is not None or y is not None:
                 raise ValueError("Cannot specify both `train_batches` and `x`/`y`.")
-            data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator] = train_batches
+            data: Union[np.ndarray, pd.DataFrame, BatchIterator] = train_batches
         if train_batches is None:
             if x is None or y is None:
                 raise ValueError("`x` and `y` must be provided unless using `train_batches`.")  
