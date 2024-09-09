@@ -76,3 +76,8 @@ class FlashPreProcessing:
         rgb_images = np.repeat(images, 3, axis=-1)
         
         return rgb_images
+    
+    @staticmethod
+    def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1) -> np.ndarray:
+        scaler = MinMaxScaler((min, max))
+        return scaler.fit_transform(x)
