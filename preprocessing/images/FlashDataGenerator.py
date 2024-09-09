@@ -15,13 +15,13 @@ class FlashDataGenerator:
                     fill_mode: str = "nearest"
                 ) -> None:
     
-        self.img_size = img_size
-        self.color_mode = color_mode
-        self.horizontal_flip = horizontal_flip
-        self.rotation_range = rotation_range
-        self.zoom_range = zoom_range
-        self.brightness_range = brightness_range
-        self.fill_mode = fill_mode
+        self.img_size: int = img_size
+        self.color_mode: Literal["rgb", "grayscale"] = color_mode
+        self.horizontal_flip: bool = horizontal_flip
+        self.rotation_range: int = rotation_range
+        self.zoom_range: float = zoom_range
+        self.brightness_range: tuple[float, float] | None = brightness_range
+        self.fill_mode: str = fill_mode
 
     def _getClassMode(self, path_or_class_list: str | list[str]):
         num_classes: int = 0
@@ -55,7 +55,8 @@ class FlashDataGenerator:
                     fill_mode=self.fill_mode
                 )
         
-        x = prepro.convertNdArrayToRGB(x)
+        if self.color_mode == 'rgb':
+            x = prepro.convertNdArrayToRGB(x)
         x = prepro.resizeNpArray(x, self.img_size, self.img_size)
 
         y = prepro.ensureOneHotEncoding(y)
@@ -81,7 +82,8 @@ class FlashDataGenerator:
                     fill_mode=self.fill_mode
                 )
         
-        x = prepro.convertNdArrayToRGB(x)
+        if self.color_mode == 'rgb':
+            x = prepro.convertNdArrayToRGB(x)
         x = prepro.resizeNpArray(x, self.img_size, self.img_size)
         
         y = prepro.ensureOneHotEncoding(y)
