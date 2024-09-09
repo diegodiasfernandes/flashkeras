@@ -77,7 +77,7 @@ class FlashSequential:
         
     def getOutputParams(self,
                 y: Union[np.ndarray, pd.Series, None] = None, 
-                image_batches: Union[DirectoryIterator, None] = None, 
+                image_batches: Union[DirectoryIterator, NumpyArrayIterator, None] = None, 
                 ) -> Tuple[str, str, int]:
         
         # Determine the number of classes (output_neurons)
@@ -93,7 +93,10 @@ class FlashSequential:
                 raise ValueError("Unsupported y type.")
         
         elif image_batches is not None:
-            num_classes = image_batches.num_classes
+            if isinstance(image_batches, DirectoryIterator):
+                num_classes = image_batches.num_classes
+            elif isinstance(image_batches, NumpyArrayIterator):
+                num_classes = len(image_batches.y[0])
         else:
             raise ValueError("Either x or y must be provided.")
         
@@ -163,9 +166,9 @@ class FlashSequential:
             *, 
             x: Union[np.ndarray, pd.DataFrame, None] = None, 
             y: Union[np.ndarray, pd.Series, None] = None, 
-            train_batches: Union[DirectoryIterator, None] = None, 
+            train_batches: Union[DirectoryIterator, NumpyArrayIterator, None] = None, 
             epochs: int = 10, 
-            validation_data: Union[DirectoryIterator, tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]], None] = None, 
+            validation_data: Union[DirectoryIterator, NumpyArrayIterator, tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]], None] = None, 
             optimizer: str = "adam", 
             learning_rate: float = 0.001, 
             metrics: list = ['accuracy'], 
@@ -175,7 +178,7 @@ class FlashSequential:
         if train_batches is not None:
             if x is not None or y is not None:
                 raise ValueError("Cannot specify both `train_batches` and `x`/`y`.")
-            data: Union[np.ndarray, pd.DataFrame, DirectoryIterator] = train_batches
+            data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator] = train_batches
         if train_batches is None:
             if x is None or y is None:
                 raise ValueError("`x` and `y` must be provided unless using `train_batches`.")  
@@ -196,7 +199,7 @@ class FlashSequential:
             train_batches=train_batches
         )
 
-        if train_batches is not None and isinstance(train_batches, DirectoryIterator):
+        if train_batches is not None and (isinstance(train_batches, DirectoryIterator) or isinstance(train_batches, NumpyArrayIterator)):
             self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
             return
         

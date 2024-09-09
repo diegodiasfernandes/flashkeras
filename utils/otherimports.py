@@ -1,7 +1,7 @@
-import numpy as np
-import pandas as pd
-import cv2
-import matplotlib.pyplot as plt
-import os
+import numpy as np # type: ignore
+import pandas as pd # type: ignore
+import cv2 # type: ignore
+import matplotlib.pyplot as plt # type: ignore
+import os # type: ignore
 import matplotlib.image as mpimg # type: ignore
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler# type: ignore
