@@ -10,7 +10,10 @@ class FlashSequential:
         self.model: Sequential = Sequential()
         self.layers = self.model.layers
         self.blocked: list[str] = []
-        self.builded = False             
+
+        self.output_activation: Literal["sigmoid", "softmax"] = "sigmoid"
+        self.output_loss: Literal["binary_crossentropy", "categorical_crossentropy"] = "binary_crossentropy"
+        self.output_neurons: int = 1          
             
     def clearFlash(self) -> None:
         '''
@@ -19,7 +22,6 @@ class FlashSequential:
         self.model = Sequential()
         self.layers = self.model.layers
         self.blocked = []
-        self.builded = False
 
     def summary(self):
         try:
@@ -67,30 +69,31 @@ class FlashSequential:
         self.model = keras.models.load_model(path_to_modelh5)
         self.blocked.append('Loaded Model: You have loaded a full model. To maintain integrity of the flash, any modifycations to the architecture are blocked.')
 
-    def _optimizerMap(self, opt: str, lr: float):
+    def _optimizerMap(self, opt: str, lr: Optional[float]):
+        if lr is None:
+            lr = 0.0001
         if opt == "adam":
             return Adam(learning_rate=lr)
         elif opt == "nadam":
             return Nadam(learning_rate=lr)
         elif opt == "sgd":
             return SGD(learning_rate=lr)
+        else:
+            return Adam()
         
-    def getOutputParams(self,
+    def setOutputParams(self,
                 y: Union[np.ndarray, pd.Series, None] = None, 
                 image_batches: Union[DirectoryIterator, NumpyArrayIterator, None] = None, 
                 ) -> Tuple[str, str, int]:
         
-        # Determine the number of classes (output_neurons)
         if y is not None:
             if isinstance(y, pd.Series):
                 num_classes = len(y.unique())
             elif isinstance(y, np.ndarray):
-                if y.ndim == 1:  # Case where y is a 1D array of labels
+                if y.ndim == 1:
                     num_classes = len(np.unique(y))
-                elif y.ndim == 2:  # Case where y is one-hot encoded
+                elif y.ndim == 2:
                     num_classes = y.shape[1]
-            else:
-                raise ValueError("Unsupported y type.")
         
         elif image_batches is not None:
             if isinstance(image_batches, DirectoryIterator):
@@ -102,29 +105,35 @@ class FlashSequential:
         
         # Determine activation and loss
         if num_classes == 2:
-            activation = "sigmoid"
-            loss = "binary_crossentropy"
-            output_neurons = 1
+            self.output_activation = "sigmoid"
+            self.output_loss = "binary_crossentropy"
+            self.output_neurons = 1
         else:
-            activation = "softmax"
-            loss = "categorical_crossentropy"
-            output_neurons = num_classes
+            self.output_activation = "softmax"
+            self.output_loss = "categorical_crossentropy"
+            self.output_neurons = num_classes
 
-        return activation, loss, output_neurons
+        return self.output_activation, self.output_loss, self.output_neurons
     
-    def _setOutputConfigs(self,
-                          opt: tuple[str, float],
-                          metrics: list,
-                          train_batches: Union[DirectoryIterator, None] = None, 
-                          y: Union[np.ndarray, pd.Series, None] = None
-                          ) -> None:
+    def setInputShape(self, input_shape: tuple):
+        new_model: Sequential = Sequential(InputLayer(input_shape=input_shape))
+        for layer in self.model.layers: 
+            new_model.add(layer)
+        self.model = new_model
+
+    def compile(self,    
+                optimizer: str = "adam",
+                learning_rate: float | None = None,
+                loss: Any | None = None,
+                metrics: Any | None = ['accuracy'],
+                ) -> None:
         
-        output_activation, output_loss, output_neurons = self.getOutputParams(y, train_batches)
-        opt = self._optimizerMap(opt[0], opt[1])
-                
-        self.model.add(Dense(output_neurons, output_activation))
-        self.model.compile(opt, output_loss, metrics)
-        self.builded = True
+        opt = self._optimizerMap(optimizer, learning_rate)
+
+        if loss is None:
+            self.model.compile(opt, self.output_loss, metrics)
+        else:
+            self.model.compile(opt, loss, metrics)
 
     @overload
     def fit(self, 
@@ -132,9 +141,6 @@ class FlashSequential:
             x: np.ndarray, 
             y: np.ndarray, 
             epochs: int = 10, 
-            optimizer: str = "adam", 
-            learning_rate: float = 0.001, 
-            metrics: list = ['accuracy'], 
             steps_per_epoch: int | None = None,
             validation_data: tuple[np.ndarray, np.ndarray] | None = None
             ) -> None: ...
@@ -144,9 +150,6 @@ class FlashSequential:
             x: pd.DataFrame, 
             y: pd.Series, 
             epochs: int = 10, 
-            optimizer: str = "adam", 
-            learning_rate: float = 0.001, 
-            metrics: list = ['accuracy'], 
             steps_per_epoch: int | None = None, 
             validation_data: tuple[pd.DataFrame, pd.Series] | None = None
             ) -> None: ...
@@ -155,9 +158,6 @@ class FlashSequential:
             *, 
             train_batches: DirectoryIterator, 
             epochs: int = 10, 
-            optimizer: str = "adam", 
-            learning_rate: float = 0.001, 
-            metrics: list = ['accuracy'], 
             steps_per_epoch: int | None = None, 
             validation_data: DirectoryIterator | None = None
             ) -> None: ...
@@ -169,9 +169,6 @@ class FlashSequential:
             train_batches: Union[DirectoryIterator, NumpyArrayIterator, None] = None, 
             epochs: int = 10, 
             validation_data: Union[DirectoryIterator, NumpyArrayIterator, tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]], None] = None, 
-            optimizer: str = "adam", 
-            learning_rate: float = 0.001, 
-            metrics: list = ['accuracy'], 
             steps_per_epoch: int | None = None 
             ) -> None:
 
@@ -186,18 +183,15 @@ class FlashSequential:
                 raise ValueError("`x` and `y` must be one of (`DataFrame` and `Series`) or (`ndarray` and `ndarray`).")  
             data = x
 
-        if not self.builded:
-            new_model: Sequential = Sequential(InputLayer(input_shape=preprocess.getInputShape(data)))
-            for layer in self.model.layers: 
-                new_model.add(layer)
-            self.model = new_model
+        self.setOutputParams(y, train_batches)
 
-        self._setOutputConfigs(
-            opt = (optimizer, learning_rate), 
-            metrics = metrics, 
-            y = y, 
-            train_batches=train_batches
-        )
+        if not self.model.inputs:
+            self.setInputShape(preprocess.getInputShape(data))
+
+        if not self.model._is_compiled:
+            self.compile()
+
+        self.model.add(Dense(self.output_neurons, self.output_activation))
 
         if train_batches is not None and (isinstance(train_batches, DirectoryIterator) or isinstance(train_batches, NumpyArrayIterator)):
             self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
