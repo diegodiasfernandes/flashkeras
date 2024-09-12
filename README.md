@@ -7,32 +7,37 @@ Also, since often keras is not used by itself, flashkeras uses also: scikit-lear
 
 Usage example:  
 ```py
-
 # loading data
-(x_train, y_train), (x_test, y_test) = load_mnist_dataset()
+from flashkeras.datasets import load_mnist
+(x_train, y_train), (x_test, y_test) = load_mnist()
 
 # preprocessing
+from flashkeras.preprocessing.images.FlashDataGenerator import FlashDataGenerator 
 flash_gen = FlashDataGenerator (
-    img_size=224, # resizing
+    img_size=71, # resizing
     rotation_range=10 # rotating
 )
 
 train_batches = flash_gen.flow_classes_from_nparray(x_train, y_train)
 test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
 
+flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as flashprep
+input_shape = flashprep.getInputShape(train_batches)
+
 # transfer learning from MobileNet
+from flashkeras.models.transferlearning.FlashTransferLearning import FlashTransferLearning
 flash_transfer = FlashTransferLearning(
-    input_shape=(224, 224, 3),
+    input_shape=input_shape,
     include_top=False, 
     freeze=2, 
     use_only_n_layers=7    
 )
-mobilenet = flash_transfer.transferMobileNet()
+xception = flash_transfer.transferXception()
 
 # create model with FlashSequential and add the transferlearning
 flash = FlashSequential()
 
-flash.addTransferLearning(mobilenet)
+flash.addTransferLearning(xception)
 flash.add(keras.layers.Flatten())
 flash.addDense(64, "relu")
 flash.addDense(32, "elu")
