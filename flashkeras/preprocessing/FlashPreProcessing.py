@@ -5,6 +5,20 @@ from flashkeras.utils.typehints import *
 class FlashPreProcessing:
 
     @staticmethod
+    def stackDataFrames(matrix_a: pd.DataFrame | np.ndarray, matrix_b: pd.DataFrame | np.ndarray):
+        if isinstance(matrix_a, pd.DataFrame) and isinstance(matrix_b, pd.DataFrame):
+            return pd.concat([matrix_a, matrix_b], ignore_index=True)
+        
+        elif isinstance(matrix_a, np.ndarray) and isinstance(matrix_b, np.ndarray):
+            return np.vstack((matrix_a, matrix_b))
+        
+        elif isinstance(matrix_a, pd.DataFrame) and isinstance(matrix_b, np.ndarray):
+            return np.vstack((matrix_a.values, matrix_b))
+        
+        else:
+            return np.vstack((matrix_a, matrix_b.values))
+
+    @staticmethod
     def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator]) -> tuple:
         if isinstance(data, NumpyArrayIterator):
             return data.x.shape[1:]
