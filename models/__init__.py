@@ -1,4 +1,6 @@
 from .FlashSequential import FlashSequential
 from .transferlearning.FlashTransferLearning import FlashTransferLearning
 
-__all__ = ['FlashSequential']
+__all__ = ['FlashSequential', 
+           'FlashTransferLearning'
+           ]
