@@ -42,7 +42,7 @@ flash = FlashSequential()
 
 flash.addTransferLearning(xception)
 flash.add(Flatten())
-flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras. Using keras.layers here would be just fine!
+flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras!
 flash.add(Dense(32, activation="elu"))
 flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
 
