@@ -15,12 +15,12 @@ Also, FlashKeras makes use of a begginer-friendly organization that is also educ
 
 Usage example:  
 ```py
-# loading data
+# 1) collecting data
 from flashkeras.data_collecting import load_mnist
 (x_train, y_train), (x_test, y_test) = load_mnist()
 
-# preprocessing
-from flashkeras.preprocessing.images.FlashDataGenerator import FlashDataGenerator 
+# 2) preprocessing
+from flashkeras.preprocessing import FlashDataGenerator 
 flash_gen = FlashDataGenerator (
     img_size=71, # resizing
     rotation_range=10 # rotating
@@ -29,26 +29,18 @@ flash_gen = FlashDataGenerator (
 train_batches = flash_gen.flow_classes_from_nparray(x_train, y_train)
 test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
 
-flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as flashprep
+from flashkeras.preprocessing import FlashPreProcessing as flashprep
 input_shape = flashprep.getInputShape(train_batches)
 
-# transfer learning from MobileNet
-from flashkeras.models.transferlearning.FlashTransferLearning import FlashTransferLearning
-flash_transfer = FlashTransferLearning(
-    input_shape=input_shape,
-    include_top=False, 
-    freeze=2, 
-    use_only_n_layers=7    
-)
-xception = flash_transfer.transferXception()
-
-# create model with FlashSequential and add the transferlearning
+# 3) model building
+from flashkeras.models import FlashSequential
 flash = FlashSequential()
 
 flash.addTransferLearning(xception)
-flash.add(keras.layers.Flatten())
-flash.addDense(64, "relu")
-flash.addDense(32, "elu")
+flash.add(Flatten())
+# it also is compatible with keras. Using keras.layers here would be just fine!
+flash.add(keras.layers.Dense(64, "relu"))
+flash.add(Dense(32, "elu"))
 flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
 ```
 
@@ -62,23 +54,23 @@ FlashKeras is based on a basic machine learning pipeline, that being:
 
 So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'evaluation'.
 
-### flashkeras.analysing
+### ``flashkeras.analysing``
 - Plotting images and Graphs
 - Matrixes
 
-### flashkeras.preprocessing
+### ``flashkeras.preprocessing``
 #### FlashPreProcessing
 - One-Hot-Encode
 - Converting and reshaping
 - Resizing
 
-#### images.FlashDatGenerator
+#### ``images.FlashDataGenerator``
 - Collect images from directory (directory batches)
 - Collect images from array (np.ndarray batches)
 - Applying Filters
 - Resizing and reshaping
 
-### flashkeras.models
+### ``flashkeras.models``
 #### FlashSequential
 - Easier to use Sequential model.
 
@@ -96,11 +88,27 @@ flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test))
 
 **TIP:** Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can use flash.getSequential() and continue from there!
 
-#### transferlearning.FlashTransferLearning
+#### ``transferlearning.FlashTransferLearning``
 - How many layers you want from a network
 - How many frozen layers you want
 - Do all of that on your own saved network
 
+##### Example
+```python
+# example of input_shape from flashkeras
+from flashkeras.preprocessing import FlashPreProcessing as flashprep
+input_shape = flashprep.getInputShape(train_batches)
+
+# transfer learning from MobileNet
+from flashkeras.models.transferlearning import FlashTransferLearning
+flash_transfer = FlashTransferLearning(
+    input_shape=input_shape,
+    include_top=False, # excluding the Dense architecture
+    freeze=2, # freezing the first 2 layers
+    use_only_n_layers=7 # using only the first 7 layers
+)
+mobile_net = flash_transfer.transferMobileNet()
+```
 ### flashkeras.evaluation
 #### FlashEvaluation
 - Accuracy, ...
