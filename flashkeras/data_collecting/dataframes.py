@@ -1,5 +1,5 @@
-from keras.datasets import boston_housing
-from sklearn.datasets import load_breast_cancer, load_diabetes, load_iris, load_wine
+from keras.datasets import boston_housing # type: ignore
+from sklearn.datasets import load_breast_cancer, load_diabetes, load_iris, load_wine # type: ignore
 
 def boston_housing_load_data(test_split: float = 0.2):
     """Loads the Boston Housing dataset.

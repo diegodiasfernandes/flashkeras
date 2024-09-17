@@ -1,4 +1,4 @@
-from keras.datasets import reuters, imdb
+from keras.datasets import reuters, imdb  # type: ignore
 
 def load_imdb():
     """Loads the [IMDB dataset](https://ai.stanford.edu/~amaas/data/sentiment/).

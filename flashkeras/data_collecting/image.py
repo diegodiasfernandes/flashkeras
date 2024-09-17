@@ -1,5 +1,5 @@
-from keras.datasets import cifar10, cifar100, fashion_mnist, mnist
-from sklearn.datasets import load_digits
+from keras.datasets import cifar10, cifar100, fashion_mnist, mnist # type: ignore
+from sklearn.datasets import load_digits # type: ignore
 
 def load_cifar10():
     """Loads the CIFAR10 dataset.
