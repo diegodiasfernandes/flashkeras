@@ -1,14 +1,10 @@
-from .analysing import images, models
-from .models import FlashSequential, FlashTransferLearning, transferlearning
-from .preprocessing import FlashPreProcessing, FlashDataGenerator, images
+from .models import FlashSequential, FlashTransferLearning
+from .preprocessing import FlashPreProcessing, FlashDataGenerator
 
-__all__ = ['images', 
-           'models', 
+__all__ = [
            'PreProcessingClass',
            'FlashSequential',
            'FlashTransferLearning',
-           'transferlearning',
            'FlashPreProcessing',
-           'FlashDataGenerator',
-           'images'
+           'FlashDataGenerator'
 ]
