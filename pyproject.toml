@@ -15,11 +15,13 @@ license = { text = "MIT" }
 homepage = "https://github.com/diegodiasfernandes/flashkeras"
 
 [project.dependencies]
-tensorflow = "==2.15.0"
-matplotlib = "==3.9.2"
-opencv-python = "==4.10.0.84"
-pandas = "==2.2.2"
-scikit-learn = "==1.5.1"
+dependencies = [
+    "tensorflow==2.15.0",
+    "matplotlib==3.9.2",
+    "opencv-python==4.10.0.84",
+    "pandas==2.2.2",
+    "scikit-learn==1.5.1"
+]
 
 [project.urls]
 "Source" = "https://github.com/diegodiasfernandes/flashkeras"
