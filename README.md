@@ -7,7 +7,7 @@ pip install git+https://github.com/diegodiasfernandes/flashkeras.git
 Note that `pip install git+https://github.com/diegodiasfernandes/flashkeras.git` would also install `tensorflow`, `matplotlib`, `opencv-python`, `pandas` and ``scikit-learn``.
 
 ## Why FlashKeras
-keras is one of the best machine learning libraries, but it is super Dense *haha*. Use this to speed up your coding using pre-generated functions.
+keras is one of the best machine learning libraries, but it is super Dense *haha*. So, ``FlashKeras`` was made to speed up your coding using pre-generated functions.
 
 Also, FlashKeras makes use of a begginer-friendly organization that is also educative, since its modules are organized based on a machine learning pipeline (data colletion, analyses, preprocessing, model building and evaluation).
 
