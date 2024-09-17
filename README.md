@@ -2,10 +2,9 @@
 
 ## Installation
 ````
-# note that this is installing tensorflow, 
-# matplotlib, opencv-python, pandas and scikit-learn
 pip install git+https://github.com/diegodiasfernandes/flashkeras.git 
 ````
+Note that `pip install git+https://github.com/diegodiasfernandes/flashkeras.git ` is also installing `tensorflow`, `matplotlib`, `opencv-python`, `pandas` and ``scikit-learn``.
 
 ## Why FlashKeras
 keras is one of the best machine learning libraries, but it is super Dense *haha*. Use this to speed up your coding using pre-generated functions.
