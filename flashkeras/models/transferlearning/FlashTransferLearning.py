@@ -79,9 +79,8 @@ class FlashTransferLearning:
             for layer in model.layers[1:]:
                 new_model.add(layer)
         else:
-            flatten_type = type(keras.layers.Flatten)
             for layer in model.layers[1:]:
-                if type(layer) == flatten_type:
+                if isinstance(layer, keras.layers.Flatten):
                     break
                 new_model.add(layer)
 
