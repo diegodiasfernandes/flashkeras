@@ -5,6 +5,9 @@ from flashkeras.utils.filesutils import count_directories_in_directory
 from flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as prepro
 
 class FlashDataGenerator:
+    """ Loads and preprocess images from directories, numpy arrays
+    
+    """
     def __init__(self,         
                     img_size: int,
                     color_mode: Literal["rgb", "grayscale"] = "rgb",
