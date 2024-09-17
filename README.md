@@ -39,8 +39,6 @@ input_shape = flashprep.getInputShape(train_batches)
 # 4) model building
 from flashkeras.models import FlashSequential
 flash = FlashSequential()
-
-flash.addTransferLearning(xception)
 flash.add(Flatten())
 flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras!
 flash.add(Dense(32, activation="elu"))
