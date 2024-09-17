@@ -16,7 +16,7 @@ Also, FlashKeras makes use of a begginer-friendly organization that is also educ
 Usage example:  
 ```py
 # loading data
-from flashkeras.datasets import load_mnist
+from flashkeras.data_collecting import load_mnist
 (x_train, y_train), (x_test, y_test) = load_mnist()
 
 # preprocessing
