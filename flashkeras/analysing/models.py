@@ -1,4 +1,4 @@
-from utils.kerasimports import Sequential
+from flashkeras.utils.kerasimports import Sequential
 
 def print_model_summary(model: Sequential):
     # Header

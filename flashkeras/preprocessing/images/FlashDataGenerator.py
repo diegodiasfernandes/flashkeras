@@ -1,8 +1,8 @@
-from utils.otherimports import *
-from utils.kerasimports import *
-from utils.typehints import *
-from utils.filesutils import count_directories_in_directory
-from preprocessing.FlashPreProcessing import FlashPreProcessing as prepro
+from flashkeras.utils.otherimports import *
+from flashkeras.utils.kerasimports import *
+from flashkeras.utils.typehints import *
+from flashkeras.utils.filesutils import count_directories_in_directory
+from flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as prepro
 
 class FlashDataGenerator:
     def __init__(self,         

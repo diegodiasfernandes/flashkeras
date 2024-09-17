@@ -1,6 +1,6 @@
-from utils.otherimports import *
-from utils.kerasimports import *
-from utils.typehints import *
+from flashkeras.utils.otherimports import *
+from flashkeras.utils.kerasimports import *
+from flashkeras.utils.typehints import *
 
 class FlashNet:
     def __init__(self, 

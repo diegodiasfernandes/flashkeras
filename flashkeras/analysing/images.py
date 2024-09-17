@@ -1,5 +1,5 @@
-from utils.otherimports import *
-from utils.typehints import BatchIterator
+from flashkeras.utils.otherimports import *
+from flashkeras.utils.typehints import BatchIterator
 
 def show_images_from_batch(batches: BatchIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
     all_images = []

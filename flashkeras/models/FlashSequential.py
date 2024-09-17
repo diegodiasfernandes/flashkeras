@@ -1,9 +1,9 @@
-from preprocessing.FlashPreProcessing import FlashPreProcessing as preprocess
-from models.transferlearning.FlashTransferLearning import FlashNet
-from analysing.models import print_model_summary
-from utils.otherimports import *
-from utils.kerasimports import *
-from utils.typehints import *
+from flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as preprocess
+from flashkeras.models.transferlearning.FlashTransferLearning import FlashNet
+from flashkeras.analysing.models import print_model_summary
+from flashkeras.utils.otherimports import *
+from flashkeras.utils.kerasimports import *
+from flashkeras.utils.typehints import *
 
 class FlashSequential:
     def __init__(self) -> None:
