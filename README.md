@@ -1,7 +1,16 @@
-# flashkeras
-keras is one of the best machine learning libraries, but it is super Dense *haha*. Use this to speed up your coding, or even consulting, as some of its methods put together keras features that doesn't seem to be related but have to be...
+# FlashKeras
 
-Also, since often keras is not used by itself, flashkeras uses also: scikit-learn, pandas, numpy, matplotlib, ...
+# Installation
+````
+# note that this is installing tensorflow, 
+# matplotlib, opencv-python, pandas and scikit-learn
+pip install git+https://github.com/diegodiasfernandes/flashkeras.git 
+````
+
+# Why FlashKeras
+keras is one of the best machine learning libraries, but it is super Dense *haha*. Use this to speed up your coding using pre-generated functions.
+
+Also, FlashKeras makes use of a begginer-friendly organization that is also educative, since its modules are organized based on a machine learning pipeline (data colletion, analyses, preprocessing, model building and evaluation).
 
 ## Basic Example
 
@@ -46,6 +55,7 @@ flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
 
 ## Basic Pipeline and Sub-Divisions
 FlashKeras is based on a basic machine learning pipeline, that being:
+- Data Colletion
 - Data Analysis
 - Pre Processing
 - Model Building
