@@ -33,9 +33,6 @@ flash_gen = FlashDataGenerator (
 train_batches = flash_gen.flow_classes_from_nparray(x_train, y_train)
 test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
 
-from flashkeras.preprocessing import FlashPreProcessing as flashprep
-input_shape = flashprep.getInputShape(train_batches)
-
 # 4) model building
 from flashkeras.models import FlashSequential
 flash = FlashSequential()
