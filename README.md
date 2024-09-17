@@ -19,10 +19,14 @@ Usage example:
 from flashkeras.data_collecting import load_mnist
 (x_train, y_train), (x_test, y_test) = load_mnist()
 
-# 2) preprocessing
+# 2) analysing
+from flashkeras.analysing import show_images_nparray
+show_images_nparray(x_train, num_images=5)
+
+# 3) preprocessing
 from flashkeras.preprocessing import FlashDataGenerator 
 flash_gen = FlashDataGenerator (
-    img_size=71, # resizing
+    img_size=32, # resizing
     rotation_range=10 # rotating
 )
 
@@ -32,16 +36,18 @@ test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
 from flashkeras.preprocessing import FlashPreProcessing as flashprep
 input_shape = flashprep.getInputShape(train_batches)
 
-# 3) model building
+# 4) model building
 from flashkeras.models import FlashSequential
 flash = FlashSequential()
 
 flash.addTransferLearning(xception)
 flash.add(Flatten())
-# it also is compatible with keras. Using keras.layers here would be just fine!
-flash.add(keras.layers.Dense(64, "relu"))
-flash.add(Dense(32, "elu"))
+flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras. Using keras.layers here would be just fine!
+flash.add(Dense(32, activation="elu"))
 flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
+
+# 5) evaluating
+# in-development...
 ```
 
 ## Basic Pipeline and Sub-Divisions
