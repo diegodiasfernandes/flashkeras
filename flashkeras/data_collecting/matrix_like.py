@@ -1,6 +1,6 @@
 from keras.datasets import reuters, imdb
 
-def imdb_load_data():
+def load_imdb():
     """Loads the [IMDB dataset](https://ai.stanford.edu/~amaas/data/sentiment/).
 
     This is a dataset of 25,000 movies reviews from IMDB, labeled by sentiment
@@ -126,7 +126,7 @@ def reuters_get_word_index():
 
     return reuters.get_word_index()
 
-def reuters_load_data(test_split: float = 0.2):
+def load_reuters(test_split: float = 0.2):
     """Loads the Reuters newswire classification dataset.
 
     This is a dataset of 11,228 newswires from Reuters, labeled over 46 topics.

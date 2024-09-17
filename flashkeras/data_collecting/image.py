@@ -1,7 +1,7 @@
-from keras.datasets import boston_housing, cifar10, cifar100, fashion_mnist, mnist
+from keras.datasets import cifar10, cifar100, fashion_mnist, mnist
 from sklearn.datasets import load_digits
 
-def cifar10_load_data():
+def load_cifar10():
     """Loads the CIFAR10 dataset.
 
     This is a dataset of 50,000 32x32 color training images and 10,000 test
@@ -52,7 +52,7 @@ def cifar10_load_data():
     """
     return cifar10.load_data()
 
-def cifar100_load_data():
+def load_cifar100():
     """Loads the CIFAR100 dataset.
 
     This is a dataset of 50,000 32x32 color training images and
@@ -94,7 +94,7 @@ def cifar100_load_data():
     """
     return cifar100.load_data()
 
-def fashion_mnist_load_data():
+def load_fashion_mnist():
     """Loads the Fashion-MNIST dataset.
     This is a dataset of 60,000 28x28 grayscale images of 10 fashion categories,
     along with a test set of 10,000 images. This dataset can be used as
@@ -137,7 +137,7 @@ def fashion_mnist_load_data():
     """
     return fashion_mnist.load_data()
 
-def mnist_load_data():
+def load_mnist():
     """Loads the MNIST dataset.
 
     This is a dataset of 60,000 28x28 grayscale images of the 10 digits,
