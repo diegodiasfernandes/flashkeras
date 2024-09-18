@@ -59,13 +59,28 @@ class FlashSequential:
         else:
             self.model.compile(opt, loss, metrics)
 
+    def build(self, 
+              data: Union[np.ndarray, pd.DataFrame, BatchIterator], 
+              y: Union[np.ndarray, pd.Series, None] = None,
+              add_auto_output_layer: bool = True
+              ) -> None:
+        ''' Automatically sets the `input_shape` and `output_layer` based on your data
+        '''
+        self._setOutputParams(y, data)
+
+        if not self.model.inputs:
+            self.setInputShape(preprocess.getInputShape(data))
+
+        if add_auto_output_layer:
+            self.model.add(Dense(self.output_neurons, self.output_activation))
+
     @overload
     def fit(self, 
             *, 
             x: np.ndarray, 
             y: np.ndarray, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = True,
+            add_auto_output_layer: bool = False,
             steps_per_epoch: int | None = None,
             validation_data: tuple[np.ndarray, np.ndarray] | None = None
             ) -> None: ...
@@ -75,7 +90,7 @@ class FlashSequential:
             x: pd.DataFrame, 
             y: pd.Series, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = True,
+            add_auto_output_layer: bool = False,
             steps_per_epoch: int | None = None, 
             validation_data: tuple[pd.DataFrame, pd.Series] | None = None
             ) -> None: ...
@@ -84,7 +99,7 @@ class FlashSequential:
             *, 
             train_batches: BatchIterator, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = True,
+            add_auto_output_layer: bool = False,
             steps_per_epoch: int | None = None, 
             validation_data: BatchIterator | None = None
             ) -> None: ...
@@ -95,7 +110,7 @@ class FlashSequential:
             y: Union[np.ndarray, pd.Series, None] = None, 
             train_batches: Optional[BatchIterator] = None, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = True,
+            add_auto_output_layer: bool = False,
             validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame] | Union[np.ndarray, pd.Series]]] = None, 
             steps_per_epoch: int | None = None 
             ) -> None:
@@ -111,16 +126,10 @@ class FlashSequential:
                 raise ValueError("`x` and `y` must be one of (`DataFrame` and `Series`) or (`ndarray` and `ndarray`).")  
             data = x
 
-        self._setOutputParams(y, train_batches)
-
-        if not self.model.inputs:
-            self.setInputShape(preprocess.getInputShape(data))
+        self.build(data, y, add_auto_output_layer)
 
         if not self.model._is_compiled:
             self.compile()
-
-        if add_auto_output_layer:
-            self.model.add(Dense(self.output_neurons, self.output_activation))
 
         if train_batches is not None and (isinstance(train_batches, DirectoryIterator) or isinstance(train_batches, NumpyArrayIterator)):
             self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
