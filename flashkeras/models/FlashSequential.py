@@ -18,31 +18,20 @@ class FlashSequential:
         self.output_activation: Literal["sigmoid", "softmax"] = "sigmoid"
         self.output_loss: Literal["binary_crossentropy", "categorical_crossentropy"] = "binary_crossentropy"
         self.output_neurons: int = 1          
-            
-    def clearFlash(self) -> None:
-        '''
-            Reset every configuration made on flash model.
-        '''
-        self.model = Sequential()
+
+    def add(self, layer) -> None:       
+        self._checkBlocked()
+
+        self.model.add(layer)
+        
         self.layers = self.model.layers
-        self.blocked = []
-
-    def summary(self):
-        try:
-            self.model.summary()
-        except:
-            print("WARNING: The model is not built yet. Only the architecture will be shown.")
-            print_model_summary(self.model)
-
-    def getLayers(self) -> list[Sequential]:
-        return self.model.layers
 
     def addTransferLearning(self, transferLayer: FlashNet) -> None: 
         '''
             Adds transfer learning layers created with FlashTransferLearning
         '''
 
-        self.checkBlocked()
+        self._checkBlocked()
 
         if transferLayer.isFullNetwork: 
             self.model = transferLayer.network
@@ -52,78 +41,6 @@ class FlashSequential:
                 self.model.add(l)
         else:
             self.model.add(transferLayer.network)   
-
-    def add(self, layer) -> None:       
-        self.checkBlocked()
-
-        self.model.add(layer)
-        
-        self.layers = self.model.layers
-
-    def checkBlocked(self) -> None:
-        if len(self.blocked) != 0:
-            err_message = 'Possible errors:\n'
-            for error in self.blocked:
-                err_message = err_message + error + '\n'
-
-            raise ValueError(err_message)
-    
-    def loadModel(self, path_to_modelh5: str):
-        print("This will Overwrite an existent model.")
-        self.model = keras.models.load_model(path_to_modelh5)
-        self.blocked.append('Loaded Model: You have loaded a full model. To maintain integrity of the flash, any modifications to the architecture are blocked.')
-
-    def _optimizerMap(self, opt: str, lr: Optional[float]):
-        if lr is None:
-            lr = 0.0001
-        if opt == "adam":
-            return Adam(learning_rate=lr)
-        elif opt == "nadam":
-            return Nadam(learning_rate=lr)
-        elif opt == "sgd":
-            return SGD(learning_rate=lr)
-        else:
-            return Adam()
-        
-    def setOutputParams(self,
-                y: Union[np.ndarray, pd.Series, None] = None, 
-                image_batches: Optional[BatchIterator] = None, 
-                ) -> Tuple[str, str, int]:
-        
-        if y is not None:
-            if isinstance(y, pd.Series):
-                num_classes = len(y.unique())
-            elif isinstance(y, np.ndarray):
-                if y.ndim == 1:
-                    num_classes = len(np.unique(y))
-                elif y.ndim == 2:
-                    num_classes = y.shape[1]
-        
-        elif image_batches is not None:
-            if isinstance(image_batches, DirectoryIterator):
-                num_classes = image_batches.num_classes
-            elif isinstance(image_batches, NumpyArrayIterator):
-                num_classes = len(image_batches.y[0])
-        else:
-            raise ValueError("Either x or y must be provided.")
-        
-        # Determine activation and loss
-        if num_classes == 2:
-            self.output_activation = "sigmoid"
-            self.output_loss = "binary_crossentropy"
-            self.output_neurons = 1
-        else:
-            self.output_activation = "softmax"
-            self.output_loss = "categorical_crossentropy"
-            self.output_neurons = num_classes
-
-        return self.output_activation, self.output_loss, self.output_neurons
-    
-    def setInputShape(self, input_shape: tuple):
-        new_model: Sequential = Sequential(InputLayer(input_shape=input_shape))
-        for layer in self.model.layers: 
-            new_model.add(layer)
-        self.model = new_model
 
     def compile(self,    
                 optimizer: str | Any = "adam",
@@ -194,7 +111,7 @@ class FlashSequential:
                 raise ValueError("`x` and `y` must be one of (`DataFrame` and `Series`) or (`ndarray` and `ndarray`).")  
             data = x
 
-        self.setOutputParams(y, train_batches)
+        self._setOutputParams(y, train_batches)
 
         if not self.model.inputs:
             self.setInputShape(preprocess.getInputShape(data))
@@ -213,3 +130,83 @@ class FlashSequential:
             x, y = preprocess.datasetToArray(x, y)
 
             self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
+
+    def summary(self):
+        try:
+            self.model.summary()
+        except:
+            print("WARNING: The model is not built yet. Only the architecture will be shown.")
+            print_model_summary(self.model)
+
+    def loadModel(self, path_to_modelh5: str):
+        print("This will Overwrite an existent model.")
+        self.model = keras.models.load_model(path_to_modelh5)
+        self.blocked.append('Loaded Model: You have loaded a full model. To maintain integrity of the flash, any modifications to the architecture are blocked.')
+
+    def setInputShape(self, input_shape: tuple):
+        new_model: Sequential = Sequential(InputLayer(input_shape=input_shape))
+        for layer in self.model.layers: 
+            new_model.add(layer)
+        self.model = new_model
+            
+    def clearFlash(self) -> None:
+        '''
+            Reset every configuration made on flash model.
+        '''
+        self.model = Sequential()
+        self.layers = self.model.layers
+        self.blocked = []
+
+    def _optimizerMap(self, opt: str, lr: Optional[float]):
+        if lr is None:
+            lr = 0.0001
+        if opt == "adam":
+            return Adam(learning_rate=lr)
+        elif opt == "nadam":
+            return Nadam(learning_rate=lr)
+        elif opt == "sgd":
+            return SGD(learning_rate=lr)
+        else:
+            return Adam()
+        
+    def _setOutputParams(self,
+                y: Union[np.ndarray, pd.Series, None] = None, 
+                image_batches: Optional[BatchIterator] = None, 
+                ) -> Tuple[str, str, int]:
+        
+        if y is not None:
+            if isinstance(y, pd.Series):
+                num_classes = len(y.unique())
+            elif isinstance(y, np.ndarray):
+                if y.ndim == 1:
+                    num_classes = len(np.unique(y))
+                elif y.ndim == 2:
+                    num_classes = y.shape[1]
+        
+        elif image_batches is not None:
+            if isinstance(image_batches, DirectoryIterator):
+                num_classes = image_batches.num_classes
+            elif isinstance(image_batches, NumpyArrayIterator):
+                num_classes = len(image_batches.y[0])
+        else:
+            raise ValueError("Either x or y must be provided.")
+        
+        # Determine activation and loss
+        if num_classes == 2:
+            self.output_activation = "sigmoid"
+            self.output_loss = "binary_crossentropy"
+            self.output_neurons = 1
+        else:
+            self.output_activation = "softmax"
+            self.output_loss = "categorical_crossentropy"
+            self.output_neurons = num_classes
+
+        return self.output_activation, self.output_loss, self.output_neurons
+
+    def _checkBlocked(self) -> None:
+        if len(self.blocked) != 0:
+            err_message = 'Possible errors:\n'
+            for error in self.blocked:
+                err_message = err_message + error + '\n'
+
+            raise ValueError(err_message)
