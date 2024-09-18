@@ -5,8 +5,12 @@ from flashkeras.utils.otherimports import *
 from flashkeras.utils.kerasimports import *
 from flashkeras.utils.typehints import *
 
+tasks_available = Literal['classification', 'regression']
+
 class FlashSequential:
-    def __init__(self, task: Literal['classification', 'regression']) -> None:
+    def __init__(self, task: tasks_available) -> None:
+        self.task: tasks_available = task
+
         self.model: Sequential = Sequential()
         self.layers = self.model.layers
         self.blocked: list[str] = []
