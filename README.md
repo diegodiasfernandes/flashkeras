@@ -87,7 +87,7 @@ flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test))
 - Set the Optimizer
 - And many more
 
-**TIP:** Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can use flash.getSequential() and continue from there!
+**TIP:** Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can always use FlashSequential.model as a normal keras.Sequential model!
 
 #### ``transferlearning.FlashTransferLearning``
 - How many layers you want from a network
@@ -101,7 +101,7 @@ from flashkeras.preprocessing import FlashPreProcessing as flashprep
 input_shape = flashprep.getInputShape(train_batches)
 
 # transfer learning from MobileNet
-from flashkeras.models.transferlearning import FlashTransferLearning
+from flashkeras.models import FlashTransferLearning
 flash_transfer = FlashTransferLearning(
     input_shape=input_shape,
     include_top=False, # excluding the Dense architecture
