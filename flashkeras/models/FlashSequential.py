@@ -136,7 +136,7 @@ class FlashSequential:
             return
         
         if x is not None and y is not None:
-            x, y = preprocess.datasetToArray(x, y)
+            # x, y = preprocess.datasetToArray(x, y)
 
             self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
 
