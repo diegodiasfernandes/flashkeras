@@ -122,13 +122,16 @@ class FlashSequential:
         self.model = new_model
 
     def compile(self,    
-                optimizer: str = "adam",
+                optimizer: str | Any = "adam",
                 learning_rate: float | None = None,
                 loss: Any | None = None,
                 metrics: Any | None = ['accuracy'],
                 ) -> None:
         
-        opt = self._optimizerMap(optimizer, learning_rate)
+        if isinstance(optimizer, str):
+            opt = self._optimizerMap(optimizer, learning_rate)
+        else:
+            opt = optimizer
 
         if loss is None:
             self.model.compile(opt, self.output_loss, metrics)
