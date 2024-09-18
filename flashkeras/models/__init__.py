@@ -1,5 +1,5 @@
 from .FlashSequential import FlashSequential
-from .transferlearning.FlashTransferLearning import FlashTransferLearning
+from .FlashTransferLearning import FlashTransferLearning
 
 __all__ = ['FlashSequential', 
            'FlashTransferLearning'

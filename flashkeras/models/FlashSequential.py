@@ -1,5 +1,5 @@
 from flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as preprocess
-from flashkeras.models.transferlearning.FlashTransferLearning import FlashNet
+from flashkeras.models.FlashTransferLearning import FlashNet
 from flashkeras.analysing.models import print_model_summary
 from flashkeras.utils.otherimports import *
 from flashkeras.utils.kerasimports import *
