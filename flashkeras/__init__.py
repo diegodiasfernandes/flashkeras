@@ -1,5 +1,7 @@
-from .models import FlashSequential, FlashTransferLearning
-from .preprocessing import FlashPreProcessing, FlashDataGenerator
+from .models.FlashSequential import FlashSequential
+from .models.FlashTransferLearning import FlashTransferLearning
+from .preprocessing.FlashPreProcessing import FlashPreProcessing
+from .preprocessing.images.FlashDataGenerator import FlashDataGenerator
 
 __all__ = [
            'FlashSequential',
