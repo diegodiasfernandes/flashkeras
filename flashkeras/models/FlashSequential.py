@@ -148,6 +148,7 @@ class FlashSequential:
             x: np.ndarray, 
             y: np.ndarray, 
             epochs: int = 10, 
+            add_auto_output_layer: bool = True,
             steps_per_epoch: int | None = None,
             validation_data: tuple[np.ndarray, np.ndarray] | None = None
             ) -> None: ...
@@ -157,6 +158,7 @@ class FlashSequential:
             x: pd.DataFrame, 
             y: pd.Series, 
             epochs: int = 10, 
+            add_auto_output_layer: bool = True,
             steps_per_epoch: int | None = None, 
             validation_data: tuple[pd.DataFrame, pd.Series] | None = None
             ) -> None: ...
@@ -165,6 +167,7 @@ class FlashSequential:
             *, 
             train_batches: BatchIterator, 
             epochs: int = 10, 
+            add_auto_output_layer: bool = True,
             steps_per_epoch: int | None = None, 
             validation_data: BatchIterator | None = None
             ) -> None: ...
@@ -175,6 +178,7 @@ class FlashSequential:
             y: Union[np.ndarray, pd.Series, None] = None, 
             train_batches: Optional[BatchIterator] = None, 
             epochs: int = 10, 
+            add_auto_output_layer: bool = True,
             validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame] | Union[np.ndarray, pd.Series]]] = None, 
             steps_per_epoch: int | None = None 
             ) -> None:
@@ -198,7 +202,8 @@ class FlashSequential:
         if not self.model._is_compiled:
             self.compile()
 
-        self.model.add(Dense(self.output_neurons, self.output_activation))
+        if add_auto_output_layer:
+            self.model.add(Dense(self.output_neurons, self.output_activation))
 
         if train_batches is not None and (isinstance(train_batches, DirectoryIterator) or isinstance(train_batches, NumpyArrayIterator)):
             self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
