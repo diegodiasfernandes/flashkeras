@@ -6,7 +6,7 @@ from flashkeras.utils.kerasimports import *
 from flashkeras.utils.typehints import *
 
 class FlashSequential:
-    def __init__(self) -> None:
+    def __init__(self, task: Literal['classification', 'regression']) -> None:
         self.model: Sequential = Sequential()
         self.layers = self.model.layers
         self.blocked: list[str] = []
