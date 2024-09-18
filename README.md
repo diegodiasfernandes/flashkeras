@@ -39,7 +39,7 @@ flash = FlashSequential()
 flash.add(Flatten())
 flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras!
 flash.add(Dense(32, activation="elu"))
-flash.fit(train_batches=train_batches, epochs=15, validation=test_batches)
+flash.fit(train_batches=train_batches, epochs=15, validation=test_batches, add_auto_output_layer=True)
 
 # 5) evaluating
 # in-development...
