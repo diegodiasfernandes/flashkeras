@@ -45,10 +45,13 @@ class FlashPreProcessing:
     def ensureOneHotEncoding(
                 y: Union[np.ndarray, pd.Series]
                 ) -> np.ndarray:
-        
+
         if isinstance(y, pd.Series):
             arr = y.astype('category').cat.codes
             return to_categorical(arr)
+
+        if len(y.shape) > 1 and y.shape[1] > 1:
+            return y
 
         return to_categorical(y)
     

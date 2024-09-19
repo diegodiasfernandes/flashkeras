@@ -122,8 +122,8 @@ class FlashSequential:
         if train_batches is None:
             if x is None or y is None:
                 raise ValueError("`x` and `y` must be provided unless using `train_batches`.")  
-            if not ( (isinstance(x, pd.DataFrame) and isinstance(y, pd.Series)) or (isinstance(x, np.ndarray) and isinstance(y, np.ndarray)) ):
-                raise ValueError("`x` and `y` must be one of (`DataFrame` and `Series`) or (`ndarray` and `ndarray`).")  
+            if not ( (isinstance(x, pd.DataFrame) or isinstance(x, np.ndarray)) and (isinstance(y, pd.Series) or isinstance(y, np.ndarray)) ):
+                raise ValueError("`x` must be of type (`pandas.DataFrame` or `np.ndarray`) and `y` (`pandas.Series` or `np.ndarray`).")  
             data = x
 
         self.build(data, y, add_auto_output_layer)
@@ -136,7 +136,8 @@ class FlashSequential:
             return
         
         if x is not None and y is not None:
-            # x, y = preprocess.datasetToArray(x, y)
+            y = preprocess.ensureOneHotEncoding(y)
+            validation_data[1] = preprocess.ensureOneHotEncoding(validation_data[1])
 
             self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
 
