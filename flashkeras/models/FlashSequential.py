@@ -77,22 +77,12 @@ class FlashSequential:
     @overload
     def fit(self, 
             *, 
-            x: np.ndarray, 
-            y: np.ndarray, 
+            x: np.ndarray | pd.DataFrame, 
+            y: np.ndarray | pd.Series, 
             epochs: int = 10, 
             add_auto_output_layer: bool = False,
             steps_per_epoch: int | None = None,
-            validation_data: tuple[np.ndarray, np.ndarray] | None = None
-            ) -> None: ...
-    @overload
-    def fit(self, 
-            *, 
-            x: pd.DataFrame, 
-            y: pd.Series, 
-            epochs: int = 10, 
-            add_auto_output_layer: bool = False,
-            steps_per_epoch: int | None = None, 
-            validation_data: tuple[pd.DataFrame, pd.Series] | None = None
+            validation_data: tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]] | None = None
             ) -> None: ...
     @overload
     def fit(self, 
@@ -111,7 +101,7 @@ class FlashSequential:
             train_batches: Optional[BatchIterator] = None, 
             epochs: int = 10, 
             add_auto_output_layer: bool = False,
-            validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame] | Union[np.ndarray, pd.Series]]] = None, 
+            validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]]] = None, 
             steps_per_epoch: int | None = None 
             ) -> None:
 
@@ -137,7 +127,9 @@ class FlashSequential:
         
         if x is not None and y is not None:
             y = preprocess.ensureOneHotEncoding(y)
-            validation_data[1] = preprocess.ensureOneHotEncoding(validation_data[1])
+            if isinstance(validation_data, tuple):
+                new_y_test = preprocess.ensureOneHotEncoding(validation_data[1])
+                validation_data = (validation_data[0], new_y_test)
 
             self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
 
