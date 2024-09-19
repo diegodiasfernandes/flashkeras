@@ -126,10 +126,10 @@ class FlashSequential:
             return
         
         if x is not None and y is not None:
-            y = preprocess.ensureOneHotEncoding(y)
+            '''y = preprocess.ensureOneHotEncoding(y)
             if isinstance(validation_data, tuple):
                 new_y_test = preprocess.ensureOneHotEncoding(validation_data[1])
-                validation_data = (validation_data[0], new_y_test)
+                validation_data = (validation_data[0], new_y_test)'''
 
             self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
 
@@ -176,11 +176,13 @@ class FlashSequential:
                 image_batches: Optional[BatchIterator] = None, 
                 ) -> Tuple[str, str, int]:
         
+        sparse_or_not: str = ""
         if y is not None:
             if isinstance(y, pd.Series):
                 num_classes = len(y.unique())
             elif isinstance(y, np.ndarray):
                 if y.ndim == 1:
+                    sparse_or_not += "sparse_"
                     num_classes = len(np.unique(y))
                 elif y.ndim == 2:
                     num_classes = y.shape[1]
@@ -200,7 +202,7 @@ class FlashSequential:
             self.output_neurons = 1
         else:
             self.output_activation = "softmax"
-            self.output_loss = "categorical_crossentropy"
+            self.output_loss = sparse_or_not + "categorical_crossentropy"
             self.output_neurons = num_classes
 
         return self.output_activation, self.output_loss, self.output_neurons
