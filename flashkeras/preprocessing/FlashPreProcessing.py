@@ -73,6 +73,13 @@ class FlashPreProcessing:
         return new_x, new_y
     
     @staticmethod
+    def convertNdArrayToGrayScale(images: np.ndarray) -> np.ndarray:
+        if images.shape[-1] == 1:
+            return images
+        grayscale_images = np.dot(images[...,:3], [0.2989, 0.5870, 0.1140])
+        return np.expand_dims(grayscale_images, axis=-1)
+
+    @staticmethod
     def resizeNpArray(array: np.ndarray, new_size1: int, new_size2: int) -> np.ndarray:
         if array.shape[1:3] == (new_size1, new_size2):
             return array
