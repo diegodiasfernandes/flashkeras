@@ -60,6 +60,9 @@ class FlashDataGenerator:
         
         if self.color_mode == 'rgb':
             x = prepro.convertNdArrayToRGB(x)
+        if self.color_mode == 'grayscale':
+            x = prepro.convertNdArrayToGrayScale(x)
+
         x = prepro.resizeNpArray(x, self.img_size, self.img_size)
 
         y = prepro.ensureOneHotEncoding(y)
@@ -87,6 +90,9 @@ class FlashDataGenerator:
         
         if self.color_mode == 'rgb':
             x = prepro.convertNdArrayToRGB(x)
+        if self.color_mode == 'grayscale':
+            x = prepro.convertNdArrayToGrayScale(x)
+    
         x = prepro.resizeNpArray(x, self.img_size, self.img_size)
         
         y = prepro.ensureOneHotEncoding(y)
