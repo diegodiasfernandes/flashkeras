@@ -16,7 +16,7 @@ class FlashSequential:
         self.blocked: list[str] = []
 
         self.output_activation: Literal["sigmoid", "softmax"] = "sigmoid"
-        self.output_loss: Literal["binary_crossentropy", "categorical_crossentropy"] = "binary_crossentropy"
+        self.output_loss: str = "binary_crossentropy"
         self.output_neurons: int = 1          
 
     def add(self, layer) -> None:       
