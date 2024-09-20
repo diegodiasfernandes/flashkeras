@@ -96,21 +96,42 @@ class FlashPreProcessing:
         return train_test_split(*arrays, test_size=test_split, random_state=random_state)
 
     @staticmethod
-    def stackDataFrames(matrix_a: pd.DataFrame | np.ndarray, matrix_b: pd.DataFrame | np.ndarray) -> pd.DataFrame | np.ndarray:
+    def stackDataFrames(matrix_a: pd.DataFrame | pd.Series | np.ndarray, 
+                        matrix_b: pd.DataFrame | pd.Series | np.ndarray
+                        ) -> pd.DataFrame | pd.Series | np.ndarray:
+        
+        def to_2d_array(data):
+            if isinstance(data, pd.DataFrame):
+                return data.values
+            elif isinstance(data, pd.Series):
+                return data.values.reshape(-1, 1)
+            elif isinstance(data, np.ndarray):
+                if data.ndim == 1:
+                    return data.reshape(-1, 1)
+                return data
+            else:
+                raise ValueError("Inputs must be either pd.DataFrame, pd.Series, or np.ndarray")
+
+        matrix_a_2d = to_2d_array(matrix_a)
+        matrix_b_2d = to_2d_array(matrix_b)
+
+        if matrix_a_2d.shape[1] != matrix_b_2d.shape[1]:
+            raise ValueError(f"Shape mismatch: matrix_a has shape {matrix_a_2d.shape} and matrix_b has shape {matrix_b_2d.shape}. Both must have the same number of columns.")
+
+        stacked = np.vstack((matrix_a_2d, matrix_b_2d))
+
         if isinstance(matrix_a, pd.DataFrame) and isinstance(matrix_b, pd.DataFrame):
-            return pd.concat([matrix_a, matrix_b], ignore_index=True)
+            return pd.DataFrame(stacked, columns=matrix_a.columns)
+        
+        elif isinstance(matrix_a, pd.Series) and isinstance(matrix_b, pd.Series):
+            return pd.Series(stacked.flatten(), name=matrix_a.name)
         
         elif isinstance(matrix_a, np.ndarray) and isinstance(matrix_b, np.ndarray):
-            return np.vstack((matrix_a, matrix_b))
+            if matrix_a.ndim == 1 and matrix_b.ndim == 1:
+                return stacked.flatten()
+            return stacked 
         
-        elif isinstance(matrix_a, pd.DataFrame) and isinstance(matrix_b, np.ndarray):
-            return np.vstack((matrix_a.values, matrix_b))
-        
-        elif isinstance(matrix_a, np.ndarray) and isinstance(matrix_b, pd.DataFrame):
-            return np.vstack((matrix_a, matrix_b.values))
-        
-        else:
-            raise ValueError("matrix_a and matrix_b should be of type `pandas.DataFrame` or `numpy.ndarray`")
+        return stacked
 
     @staticmethod
     def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator]) -> tuple:
