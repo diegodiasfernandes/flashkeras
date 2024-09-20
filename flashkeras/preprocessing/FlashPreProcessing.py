@@ -133,6 +133,49 @@ class FlashPreProcessing:
         
         return stacked
 
+    @overload
+    @staticmethod
+    def stackImageDatasets(data_a: np.ndarray, data_b: np.ndarray) -> np.ndarray: ...
+    
+    @overload
+    @staticmethod
+    def stackImageDatasets(data_a: Tuple[np.ndarray, np.ndarray], data_b: Tuple[np.ndarray, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]: ...
+    
+    @staticmethod
+    def stackImageDatasets(data_a: np.ndarray | Tuple[np.ndarray, np.ndarray], 
+                       data_b: np.ndarray | Tuple[np.ndarray, np.ndarray]
+                       ) -> np.ndarray | Tuple[np.ndarray, np.ndarray]:
+        
+        if isinstance(data_a, np.ndarray) and isinstance(data_b, np.ndarray):
+            if data_a.shape[1:] != data_b.shape[1:]:
+                raise ValueError(f"Shape mismatch: data_a has shape {data_a.shape} and data_b has shape {data_b.shape}. "
+                                 f"Both must have the same shape except for the first dimension.")
+
+            return np.concatenate([data_a, data_b], axis=0)
+        
+        elif isinstance(data_a, tuple) and isinstance(data_b, tuple):
+            if len(data_a) != 2 or len(data_b) != 2:
+                raise ValueError("Both inputs should be tuples of length 2, (images, labels).")
+            
+            images_a, labels_a = data_a
+            images_b, labels_b = data_b
+            
+            if images_a.shape[1:] != images_b.shape[1:]:
+                raise ValueError(f"Shape mismatch in images: images_a has shape {images_a.shape} and images_b has shape {images_b.shape}. "
+                                 f"Both must have the same shape except for the first dimension.")
+            
+            if labels_a.shape[1:] != labels_b.shape[1:]:
+                raise ValueError(f"Shape mismatch in labels: labels_a has shape {labels_a.shape} and labels_b has shape {labels_b.shape}. "
+                                 f"Both must have the same shape except for the first dimension.")
+            
+            merged_images = np.concatenate([images_a, images_b], axis=0)
+            merged_labels = np.concatenate([labels_a, labels_b], axis=0)
+            
+            return (merged_images, merged_labels)
+        
+        else:
+            raise TypeError("Inputs must be either both ndarrays or both tuples of (images, labels).")
+
     @staticmethod
     def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator]) -> tuple:
         if isinstance(data, NumpyArrayIterator):
