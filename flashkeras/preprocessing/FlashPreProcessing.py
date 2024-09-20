@@ -74,6 +74,8 @@ class FlashPreProcessing:
     
     @staticmethod
     def resizeNpArray(array: np.ndarray, new_size1: int, new_size2: int) -> np.ndarray:
+        if array.shape[1:3] == (new_size1, new_size2):
+            return array
         if len(array.shape) == 3:
             array = np.expand_dims(array, axis=-1)
         resized_array = tf.image.resize(array, (new_size1, new_size2)).numpy()
