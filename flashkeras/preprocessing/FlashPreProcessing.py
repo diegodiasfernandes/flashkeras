@@ -94,12 +94,13 @@ class FlashPreProcessing:
             np.ndarray, A batch of images with shape (num_images, height, width, 3).
         """
 
+        if images.shape[-1] == 3:
+            return images
+        
         if len(images.shape) == 3:
-            images = np.expand_dims(images, axis=-1) 
-        
-        rgb_images = np.repeat(images, 3, axis=-1)
-        
-        return rgb_images
+            images = np.expand_dims(images, axis=-1)
+            
+        return np.repeat(images, 3, axis=-1)
     
     @staticmethod
     def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1) -> np.ndarray:
