@@ -7,7 +7,7 @@ pip install git+https://github.com/diegodiasfernandes/flashkeras.git
 Note that `pip install git+https://github.com/diegodiasfernandes/flashkeras.git` would also install `tensorflow`, `matplotlib`, `opencv-python`, `pandas` and ``scikit-learn``.
 
 ## Why FlashKeras
-keras is one of the best machine learning libraries, but it is super Dense *haha*. So, ``FlashKeras`` was made to speed up your coding using pre-generated functions.
+keras is one of the best machine learning libraries, but it is super *Dense*. So, ``FlashKeras`` was made to speed up your coding using pre-generated functions.
 
 Also, FlashKeras makes use of a begginer-friendly organization that is also educative, since its modules are organized based on a machine learning pipeline (data colletion, analyses, preprocessing, model building and evaluation).
 
@@ -16,7 +16,7 @@ Also, FlashKeras makes use of a begginer-friendly organization that is also educ
 Usage example:  
 ```py
 # 1) collecting data
-from flashkeras.data_collecting import load_mnist
+from flashkeras.data_collecting.datasets import load_mnist
 (x_train, y_train), (x_test, y_test) = load_mnist()
 
 # 2) analysing
@@ -36,14 +36,15 @@ test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
 # 4) model building
 from flashkeras.models.layers import *
 from flashkeras.models import FlashSequential
-flash = FlashSequential()
+flash = FlashSequential('classification')
 flash.add(Flatten())
 flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras!
 flash.add(Dense(32, activation="elu"))
-flash.fit(train_batches=train_batches, epochs=15, validation=test_batches, add_auto_output_layer=True)
+flash.fit(train_batches=train_batches, epochs=15, validation=test_batches, auto_output_layer=True)
 
 # 5) evaluating
-# in-development...
+from flashkeras.evaluation import FlashEvaluating as eval
+recall = eval.getRecall(flash, x_test, y_test)
 ```
 
 ## Basic Pipeline and Sub-Divisions
@@ -80,7 +81,7 @@ Example:
 ```py
 flash = FlashSequential()
 flash.addDense(32, "relu")
-flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test))
+flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test), auto_output_layer=True)
 ```
 *What's new???* there is no need to (besides possible...):
 - Give the input_shape
@@ -113,4 +114,5 @@ mobile_net = flash_transfer.transferMobileNet()
 ```
 ### flashkeras.evaluation
 #### FlashEvaluation
-- Accuracy, ...
+- Accuracy, Recall, Precision, F1-Score
+- MSE, MEA
