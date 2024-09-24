@@ -8,44 +8,53 @@ class FlashEvaluating:
 
     @staticmethod
     def _adjustClassMetrics(model: FlashSequential | Sequential, 
-                              x_test: pd.DataFrame | np.ndarray | BatchIterator, 
-                              y_test: pd.Series | np.ndarray | None = None
-                              ) -> tuple[pd.Series | np.ndarray, Any]:
-        
+                            x_test: pd.DataFrame | np.ndarray | BatchIterator, 
+                            y_test: pd.Series | np.ndarray | None = None
+                            ) -> tuple[pd.Series | np.ndarray, Any]:
+
         if not isinstance(model, Sequential):
             true_model = model.model
         else:
             true_model = model
-        
+
         if isinstance(x_test, (DirectoryIterator, NumpyArrayIterator)):
-            x_test = np.concatenate([x for x, _ in x_test], axis=0)
-            y_test = np.concatenate([y for _, y in x_test], axis=0)
+            x_list = [x for x, _ in x_test]
+            y_list = [y for _, y in x_test]
+            x_test = np.concatenate(x_list, axis=0)
+            y_test = np.concatenate(y_list, axis=0)
 
             y_pred = true_model.predict(x_test)
             y_pred_classes = y_pred.argmax(axis=-1)
 
-            if y_test.ndim > 1 and y_test.shape[1] > 1:
-                y_test = y_test.argmax(axis=-1)
+            if y_test is None: 
+                raise ValueError("``y_test`` became None at some point.")
 
-            if y_test is None: raise ValueError("``y_test`` became None at some point.")
+            if y_test.ndim > 1 and y_test.shape[1] > 1:
+                y_test = np.argmax(y_test, axis=-1)
+
+            if y_test is None: 
+                raise ValueError("``y_test`` became None at ``np.argmax(y_test, axis=-1)``.")
 
             return y_test, y_pred_classes
-        
+
         if y_test is None:
             raise ValueError('``y_test`` must be provided if Test Data is not a ``BatchIterator``')
 
         if isinstance(x_test, pd.DataFrame):
             x_test = x_test.values
-        
+
         y_pred = true_model.predict(x_test)
         y_pred_classes = y_pred.argmax(axis=-1)
-        
+
         if isinstance(y_test, pd.Series):
-            y_test = y_test.values
-        
+            y_test = y_test.to_numpy()
+
         if y_test.ndim > 1 and y_test.shape[1] > 1:
-            y_test = y_test.argmax(axis=-1)
-        
+            y_test = np.argmax(y_test, axis=-1)
+
+        if y_test is None: 
+            raise ValueError("``y_test`` became None at ``np.argmax(y_test, axis=-1)``.")
+
         return y_test, y_pred_classes
 
     @staticmethod
