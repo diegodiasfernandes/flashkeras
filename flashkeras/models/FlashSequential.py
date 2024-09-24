@@ -135,6 +135,30 @@ class FlashSequential:
         
         return self.model.predict(x=x, batch_size=batch_size, verbose=verbose, steps=steps)
 
+    def singlePredict(self, instance: Any):
+        if isinstance(instance, np.ndarray):
+            if len(instance.shape) == 2:
+                instance = np.expand_dims(instance, axis=-1)
+
+            if len(instance.shape) == 3:
+                instance = np.expand_dims(instance, axis=0)
+            elif len(instance.shape) == 1:
+                instance = np.expand_dims(instance, axis=0)
+
+        elif isinstance(instance, pd.DataFrame):
+            if len(instance.shape) == 1 or instance.shape[0] == 1:
+                instance = instance.to_numpy().reshape(1, -1)
+
+        prediction = cast(np.ndarray, self.predict(instance))
+
+        if len(prediction.shape) == 2:
+            return np.argmax(prediction, axis=1)
+        
+        elif len(prediction.shape) == 1:
+            return prediction
+
+        return prediction
+
     def summary(self):
         try:
             self.model.summary()
