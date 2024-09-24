@@ -46,23 +46,28 @@ class FlashSequential:
                 optimizer: str | Any = "adam",
                 learning_rate: float | None = None,
                 loss: Any | None = None,
-                metrics: Any | None = ['accuracy'],
+                metrics: Any = None,
                 ) -> None:
+        
+        if loss is None: raise ValueError("loss value must be provided, cannt be ``None``")
+
+        if metrics is None:
+            if self.task == 'classification':
+                metrics = ['accuracy']
+            elif self.task == 'regression':
+                metrics = ['mae']
         
         if isinstance(optimizer, str):
             opt = self._optimizerMap(optimizer, learning_rate)
         else:
             opt = optimizer
-
-        if loss is None:
-            self.model.compile(opt, self.output_loss, metrics)
-        else:
-            self.model.compile(opt, loss, metrics)
+        
+        self.model.compile(opt, loss, metrics)
 
     def build(self, 
               data: Union[np.ndarray, pd.DataFrame, BatchIterator], 
-              y: Union[np.ndarray, pd.Series, None] = None,
-              add_auto_output_layer: bool = True
+              y: Union[np.ndarray, pd.DataFrame, pd.Series, None] = None,
+              auto_output_layer: bool = True
               ) -> None:
         ''' Automatically sets the `input_shape` and `output_layer` based on your data
         '''
@@ -71,16 +76,20 @@ class FlashSequential:
         if not self.model.inputs:
             self.setInputShape(preprocess.getInputShape(data))
 
-        if add_auto_output_layer:
-            self.model.add(Dense(self.output_neurons, self.output_activation))
+        if auto_output_layer:
+
+            if self.task == 'classification':
+                self.model.add(Dense(self.output_neurons, self.output_activation))
+            elif self.task == 'regression':
+                self.model.add(Dense(self.output_neurons))
 
     @overload
     def fit(self, 
             *, 
             x: np.ndarray | pd.DataFrame, 
-            y: np.ndarray | pd.Series, 
+            y: np.ndarray | pd.DataFrame | pd.Series, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = False,
+            auto_output_layer: bool = False,
             steps_per_epoch: int | None = None,
             validation_data: tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]] | None = None
             ) -> None: ...
@@ -89,7 +98,7 @@ class FlashSequential:
             *, 
             train_batches: BatchIterator, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = False,
+            auto_output_layer: bool = False,
             steps_per_epoch: int | None = None, 
             validation_data: BatchIterator | None = None
             ) -> None: ...
@@ -97,10 +106,10 @@ class FlashSequential:
     def fit(self, 
             *, 
             x: Union[np.ndarray, pd.DataFrame, None] = None, 
-            y: Union[np.ndarray, pd.Series, None] = None, 
+            y: Union[np.ndarray, pd.DataFrame, pd.Series, None] = None, 
             train_batches: Optional[BatchIterator] = None, 
             epochs: int = 10, 
-            add_auto_output_layer: bool = False,
+            auto_output_layer: bool = False,
             validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]]] = None, 
             steps_per_epoch: int | None = None 
             ) -> None:
@@ -116,10 +125,10 @@ class FlashSequential:
                 raise ValueError("`x` must be of type (`pandas.DataFrame` or `np.ndarray`) and `y` (`pandas.Series` or `np.ndarray`).")  
             data = x
 
-        self.build(data, y, add_auto_output_layer)
+        self.build(data, y, auto_output_layer)
 
         if not self.model._is_compiled:
-            self.compile()
+            self.compile(loss=self.output_loss)
 
         if train_batches is not None and (isinstance(train_batches, DirectoryIterator) or isinstance(train_batches, NumpyArrayIterator)):
             self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
@@ -172,40 +181,53 @@ class FlashSequential:
             return Adam()
         
     def _setOutputParams(self,
-                y: Union[np.ndarray, pd.Series, None] = None, 
+                y: Union[np.ndarray, pd.DataFrame, pd.Series, None] = None, 
                 image_batches: Optional[BatchIterator] = None, 
-                ) -> Tuple[str, str, int]:
+                ) -> None:
         
-        sparse_or_not: str = ""
-        if y is not None:
-            if isinstance(y, pd.Series):
-                num_classes = len(y.unique())
-            elif isinstance(y, np.ndarray):
-                if y.ndim == 1:
-                    sparse_or_not += "sparse_"
-                    num_classes = len(np.unique(y))
-                elif y.ndim == 2:
-                    num_classes = y.shape[1]
+        if self.task == 'classification':
+            sparse_or_not: str = ""
+            if y is not None:
+                if isinstance(y, pd.Series):
+                    num_classes = len(y.unique())
+                elif isinstance(y, np.ndarray):
+                    if y.ndim == 1:
+                        sparse_or_not += "sparse_"
+                        num_classes = len(np.unique(y))
+                    elif y.ndim == 2:
+                        num_classes = y.shape[1]
+            
+            elif image_batches is not None:
+                if isinstance(image_batches, DirectoryIterator):
+                    num_classes = image_batches.num_classes
+                elif isinstance(image_batches, NumpyArrayIterator):
+                    num_classes = len(image_batches.y[0])
+            else:
+                raise ValueError("Either x or y must be provided.")
+            
+            # Determine activation and loss
+            if num_classes == 2:
+                self.output_activation = "sigmoid"
+                self.output_loss = "binary_crossentropy"
+                self.output_neurons = 1
+            else:
+                self.output_activation = "softmax"
+                self.output_loss = sparse_or_not + "categorical_crossentropy"
+                self.output_neurons = num_classes
         
-        elif image_batches is not None:
-            if isinstance(image_batches, DirectoryIterator):
-                num_classes = image_batches.num_classes
-            elif isinstance(image_batches, NumpyArrayIterator):
-                num_classes = len(image_batches.y[0])
-        else:
-            raise ValueError("Either x or y must be provided.")
-        
-        # Determine activation and loss
-        if num_classes == 2:
-            self.output_activation = "sigmoid"
-            self.output_loss = "binary_crossentropy"
-            self.output_neurons = 1
-        else:
-            self.output_activation = "softmax"
-            self.output_loss = sparse_or_not + "categorical_crossentropy"
-            self.output_neurons = num_classes
-
-        return self.output_activation, self.output_loss, self.output_neurons
+        elif self.task == 'regression':
+            if y is None:
+                raise ValueError('``y`` cannot be None value.')
+            
+            if isinstance(y, (pd.Series, np.ndarray)):
+                if y.ndim > 1:
+                    self.output_neurons = y.shape[1]
+                else:
+                    self.output_neurons = 1
+            else:
+                self.output_neurons = len(y.columns)
+            
+            self.output_loss = 'mse'
 
     def _checkBlocked(self) -> None:
         if len(self.blocked) != 0:
