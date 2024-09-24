@@ -83,64 +83,57 @@ class FlashSequential:
             elif self.task == 'regression':
                 self.model.add(Dense(self.output_neurons))
 
-    @overload
     def fit(self, 
-            *, 
-            x: np.ndarray | pd.DataFrame, 
-            y: np.ndarray | pd.DataFrame | pd.Series, 
-            epochs: int = 10, 
+            x: Any | None = None,
+            y: Any | None = None,
+            epochs: int = 1,
             auto_output_layer: bool = False,
-            steps_per_epoch: int | None = None,
-            validation_data: tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]] | None = None
-            ) -> None: ...
-    @overload
-    def fit(self, 
-            *, 
-            train_batches: BatchIterator, 
-            epochs: int = 10, 
-            auto_output_layer: bool = False,
-            steps_per_epoch: int | None = None, 
-            validation_data: BatchIterator | None = None
-            ) -> None: ...
+            validation_data: Any | None = None,
+            steps_per_epoch: Any | None = None,
+            batch_size: Any | None = None,
+            verbose: str = "auto",
+            callbacks: Any | None = None,
+            validation_split: float = 0,
+            shuffle: bool = True,
+            class_weight: Any | None = None,
+            sample_weight: Any | None = None,
+            initial_epoch: int = 0
+            ) -> Any:
 
-    def fit(self, 
-            *, 
-            x: Union[np.ndarray, pd.DataFrame, None] = None, 
-            y: Union[np.ndarray, pd.DataFrame, pd.Series, None] = None, 
-            train_batches: Optional[BatchIterator] = None, 
-            epochs: int = 10, 
-            auto_output_layer: bool = False,
-            validation_data: Optional[BatchIterator | tuple[Union[np.ndarray, pd.DataFrame], Union[np.ndarray, pd.Series]]] = None, 
-            steps_per_epoch: int | None = None 
-            ) -> None:
-
-        if train_batches is not None:
-            if x is not None or y is not None:
-                raise ValueError("Cannot specify both `train_batches` and `x`/`y`.")
-            data: Union[np.ndarray, pd.DataFrame, BatchIterator] = train_batches
-        if train_batches is None:
-            if x is None or y is None:
-                raise ValueError("`x` and `y` must be provided unless using `train_batches`.")  
-            if not ( (isinstance(x, pd.DataFrame) or isinstance(x, np.ndarray)) and (isinstance(y, pd.Series) or isinstance(y, np.ndarray)) ):
-                raise ValueError("`x` must be of type (`pandas.DataFrame` or `np.ndarray`) and `y` (`pandas.Series` or `np.ndarray`).")  
-            data = x
-
-        self.build(data, y, auto_output_layer)
+        self.build(x, y, auto_output_layer)
 
         if not self.model._is_compiled:
             self.compile(loss=self.output_loss)
 
-        if train_batches is not None and (isinstance(train_batches, DirectoryIterator) or isinstance(train_batches, NumpyArrayIterator)):
-            self.model.fit(train_batches, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
-            return
+        if isinstance(x, (DirectoryIterator, NumpyArrayIterator)):
+            history = self.model.fit(x, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch,
+                           batch_size=batch_size, verbose=verbose, callbacks=callbacks, validation_split=validation_split,
+                           shuffle=shuffle, class_weight=class_weight, sample_weight=sample_weight, initial_epoch=initial_epoch)
+            return history
         
         if x is not None and y is not None:
-            '''y = preprocess.ensureOneHotEncoding(y)
-            if isinstance(validation_data, tuple):
-                new_y_test = preprocess.ensureOneHotEncoding(validation_data[1])
-                validation_data = (validation_data[0], new_y_test)'''
-
-            self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch)
+            history = self.model.fit(x, y, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch,
+                           batch_size=batch_size, verbose=verbose, callbacks=callbacks, validation_split=validation_split,
+                           shuffle=shuffle, class_weight=class_weight, sample_weight=sample_weight, initial_epoch=initial_epoch)
+            return history
+        elif x is not None and y is None:
+            history = self.model.fit(x, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch,
+                           batch_size=batch_size, verbose=verbose, callbacks=callbacks, validation_split=validation_split,
+                           shuffle=shuffle, class_weight=class_weight, sample_weight=sample_weight, initial_epoch=initial_epoch)
+            return history
+        
+    def predict(self,
+                x: Any,
+                batch_size: Any | None = None,
+                verbose: str = "auto",
+                steps: Any | None = None,
+                # callbacks: Any | None = None,
+                # max_queue_size: int = 10,
+                # workers: int = 1,
+                # use_multiprocessing: bool = False
+                ) -> Any:
+        
+        return self.model.predict(x=x, batch_size=batch_size, verbose=verbose, steps=steps)
 
     def summary(self):
         try:
