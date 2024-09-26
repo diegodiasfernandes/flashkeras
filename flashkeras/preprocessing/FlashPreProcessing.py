@@ -272,7 +272,21 @@ class FlashPreProcessing:
         return scaler.fit_transform(x)
     
     @staticmethod
-    def labelEncoder(y: Union[np.ndarray, pd.Series]):
-        le = LabelEncoder()
+    def labelEncoder(y: Union[np.ndarray, pd.Series], 
+                     return_encoder: bool = False
+                     ) -> np.ndarray | tuple[np.ndarray, LabelEncoder]:
+        
+        le: LabelEncoder = LabelEncoder()
         le.fit(y)
+
+        if return_encoder:
+            return le.transform(y), le
+
         return le.transform(y)
+    
+    @staticmethod
+    def labelDecoder(labels: Union[np.ndarray, pd.Series], 
+                     encoder: LabelEncoder
+                     ) -> np.ndarray:
+
+        return encoder.transform(encoder.inverse_transform(labels))
