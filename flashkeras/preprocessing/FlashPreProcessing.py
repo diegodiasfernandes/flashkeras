@@ -270,3 +270,9 @@ class FlashPreProcessing:
     def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1) -> np.ndarray:
         scaler = MinMaxScaler((min, max))
         return scaler.fit_transform(x)
+    
+    @staticmethod
+    def labelEncoder(y: Union[np.ndarray, pd.Series]):
+        le = LabelEncoder()
+        le.fit(y)
+        return le.transform(y)
