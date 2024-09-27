@@ -197,6 +197,23 @@ class FlashPreProcessing:
                 return (shape[0], shape[1], 3)   
 
     @staticmethod
+    def getImageShape(image: Union[np.ndarray, Image.Image, str]) -> Tuple[int, int]:
+
+        if isinstance(image, str):
+            image = Image.open(image)
+
+        if isinstance(image, Image.Image):
+            image = np.array(image)
+
+        if isinstance(image, np.ndarray):
+            if image.ndim == 2:
+                return (image.shape[0], image.shape[1])
+            elif image.ndim == 3:
+                return (image.shape[0], image.shape[1])
+        
+        raise ValueError("Formato de imagem não suportado.")
+
+    @staticmethod
     def ensureOneHotEncoding(
                 y: Union[np.ndarray, pd.Series]
                 ) -> np.ndarray:
@@ -272,7 +289,7 @@ class FlashPreProcessing:
         return scaler.fit_transform(x)
     
     @staticmethod
-    def labelEncoder(y: Union[np.ndarray, pd.Series], 
+    def labelEncoder(y: Union[np.ndarray, pd.Series, list], 
                      return_encoder: bool = False
                      ) -> np.ndarray | tuple[np.ndarray, LabelEncoder]:
         
@@ -285,7 +302,7 @@ class FlashPreProcessing:
         return le.transform(y)
     
     @staticmethod
-    def labelDecoder(labels: Union[np.ndarray, pd.Series], 
+    def labelDecoder(labels: Union[np.ndarray, pd.Series, list], 
                      encoder: LabelEncoder
                      ) -> np.ndarray:
 

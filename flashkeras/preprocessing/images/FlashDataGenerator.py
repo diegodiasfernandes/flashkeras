@@ -46,7 +46,7 @@ class FlashDataGenerator:
     def flow_images_from_directory(self,
                                    directory_path: str,
                                    batch_size: int = 32
-                                   ) -> NumpyArrayIterator:
+                                   ) -> DirectoryIterator:
         
         data_gen = ImageDataGenerator(
                     rescale=1./255,
@@ -59,6 +59,7 @@ class FlashDataGenerator:
 
         image_iterator = data_gen.flow_from_directory(
             directory_path,
+            color_mode=self.color_mode,
             target_size=self.img_shape,
             batch_size=batch_size,
             class_mode=None,
@@ -185,7 +186,7 @@ class FlashDataGenerator:
         test_batches = data_gen.flow_from_directory(
             path_to_main_dir,
             color_mode=self.color_mode,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             class_mode=class_mode,
             batch_size=batch_size,
             shuffle=True,
@@ -258,7 +259,7 @@ class FlashDataGenerator:
         test_batches = data_gen.flow_from_directory(
             path_to_main_dir,
             color_mode=self.color_mode,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             class_mode=class_mode,
             classes=classes,
             batch_size=batch_size,
