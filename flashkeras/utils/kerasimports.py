@@ -7,3 +7,4 @@ from keras.applications import MobileNet, ResNet50, Xception, VGG16 # type: igno
 from keras.src.engine.functional import Functional # type: ignore
 import tensorflow as tf # type: ignore
 from keras.utils import to_categorical # type: ignore
+from keras.preprocessing.image import img_to_array, load_img # type: ignore
