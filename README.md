@@ -111,6 +111,9 @@ flash_transfer = FlashTransferLearning(
     use_only_n_layers=7 # using only the first 7 layers
 )
 mobile_net = flash_transfer.transferMobileNet()
+
+# add mobilenet to the flash sequential
+flash.addTransferLearning(mobile_net)
 ```
 ### flashkeras.evaluation
 #### FlashEvaluation
