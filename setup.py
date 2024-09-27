@@ -2,14 +2,14 @@ from setuptools import setup, find_packages # type: ignore
 
 setup(
     name="flashkeras",
-    version="0.1.0",
+    version="0.1.1",
     packages=find_packages(include=['flashkeras', 'flashkeras.*']),
     install_requires=[ 
         'tensorflow==2.15.0',
-        'matplotlib==3.9.2',
-        'opencv-python==4.10.0.84',
-        'pandas==2.2.2',
-        'scikit-learn==1.5.1'
+        'matplotlib>=3.9.2',
+        'opencv-python>=4.10.0.84',
+        'pandas>=2.2.2',
+        'scikit-learn>=1.5.1'
     ],
     author="diego dias fernandes",
     author_email="diegodiasfernandes.comp@gmail.com",
