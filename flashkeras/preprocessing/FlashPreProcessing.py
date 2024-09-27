@@ -198,6 +198,8 @@ class FlashPreProcessing:
 
     @staticmethod
     def getImageShape(image: Union[np.ndarray, Image.Image, str]) -> Tuple[int, int]:
+        '''Provide the image or path to the image and get its dimensions size i.e. (32, 32).
+        '''
 
         if isinstance(image, str):
             image = Image.open(image)
@@ -211,7 +213,7 @@ class FlashPreProcessing:
             elif image.ndim == 3:
                 return (image.shape[0], image.shape[1])
         
-        raise ValueError("Formato de imagem não suportado.")
+        raise ValueError("The image must be one of the following types: ``np.ndarray``, ``Image.Image`` or a ``str`` representing the path.")
 
     @staticmethod
     def ensureOneHotEncoding(
