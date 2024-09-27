@@ -43,9 +43,33 @@ class FlashDataGenerator:
 
         return class_mode
 
+    def flow_images_from_directory(self,
+                                   directory_path: str,
+                                   batch_size: int = 32
+                                   ) -> NumpyArrayIterator:
+        
+        data_gen = ImageDataGenerator(
+                    rescale=1./255,
+                    horizontal_flip=self.horizontal_flip,
+                    rotation_range=self.rotation_range,
+                    zoom_range=self.zoom_range,
+                    brightness_range=self.brightness_range,
+                    fill_mode=self.fill_mode
+                )
+
+        image_iterator = data_gen.flow_from_directory(
+            directory_path,
+            target_size=(self.img_size, self.img_size),
+            batch_size=batch_size,
+            class_mode=None,
+            shuffle=False
+        )
+
+        return image_iterator
+
     def flow_classes_from_nparray(self, 
                                   x: np.ndarray, 
-                                  y: np.ndarray,
+                                  y: np.ndarray | None = None,
                                   batch_size: int = 32
                                   ) -> NumpyArrayIterator:
         
@@ -64,8 +88,6 @@ class FlashDataGenerator:
             x = prepro.convertNdArrayToGrayScale(x)
 
         x = prepro.resizeNpArray(x, self.img_size, self.img_size)
-
-        y = prepro.ensureOneHotEncoding(y)
         
         batches = data_gen.flow(x, y, batch_size, shuffle=True)
 
