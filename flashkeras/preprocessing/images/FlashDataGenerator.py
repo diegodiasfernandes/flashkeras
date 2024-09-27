@@ -9,7 +9,7 @@ class FlashDataGenerator:
     
     """
     def __init__(self,         
-                    img_size: int,
+                    img_shape: tuple[int, int],
                     color_mode: Literal["rgb", "grayscale"] = "rgb",
                     horizontal_flip: bool = False,
                     rotation_range: int = 0,
@@ -18,7 +18,7 @@ class FlashDataGenerator:
                     fill_mode: str = "nearest"
                 ) -> None:
     
-        self.img_size: int = img_size
+        self.img_shape: tuple[int, int] = img_shape
         self.color_mode: Literal["rgb", "grayscale"] = color_mode
         self.horizontal_flip: bool = horizontal_flip
         self.rotation_range: int = rotation_range
@@ -59,7 +59,7 @@ class FlashDataGenerator:
 
         image_iterator = data_gen.flow_from_directory(
             directory_path,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             batch_size=batch_size,
             class_mode=None,
             shuffle=False
@@ -87,7 +87,7 @@ class FlashDataGenerator:
         if self.color_mode == 'grayscale':
             x = prepro.convertNdArrayToGrayScale(x)
 
-        x = prepro.resizeNpArray(x, self.img_size, self.img_size)
+        x = prepro.resizeNpArray(x, self.img_shape[0], self.img_shape[1])
         
         batches = data_gen.flow(x, y, batch_size, shuffle=True)
 
@@ -115,7 +115,7 @@ class FlashDataGenerator:
         if self.color_mode == 'grayscale':
             x = prepro.convertNdArrayToGrayScale(x)
     
-        x = prepro.resizeNpArray(x, self.img_size, self.img_size)
+        x = prepro.resizeNpArray(x, self.img_shape[0], self.img_shape[1])
         
         y = prepro.ensureOneHotEncoding(y)
         
@@ -145,7 +145,7 @@ class FlashDataGenerator:
         batches = data_gen.flow_from_directory(
             path_to_main_dir,
             color_mode=self.color_mode,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             class_mode=class_mode,
             batch_size=batch_size,
             shuffle=True,
@@ -175,7 +175,7 @@ class FlashDataGenerator:
         train_batches = data_gen.flow_from_directory(
             path_to_main_dir,
             color_mode=self.color_mode,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             class_mode=class_mode,
             batch_size=batch_size,
             shuffle=True,
@@ -215,7 +215,7 @@ class FlashDataGenerator:
         batches = data_gen.flow_from_directory(
             path_to_main_dir,
             color_mode=self.color_mode,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             class_mode=class_mode,
             classes=classes,
             batch_size=batch_size,
@@ -247,7 +247,7 @@ class FlashDataGenerator:
         train_batches = data_gen.flow_from_directory(
             path_to_main_dir,
             color_mode=self.color_mode,
-            target_size=(self.img_size, self.img_size),
+            target_size=self.img_shape,
             class_mode=class_mode,
             classes=classes,
             batch_size=batch_size,
