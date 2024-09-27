@@ -289,4 +289,4 @@ class FlashPreProcessing:
                      encoder: LabelEncoder
                      ) -> np.ndarray:
 
-        return encoder.transform(encoder.inverse_transform(labels))
+        return (encoder.inverse_transform(labels))
