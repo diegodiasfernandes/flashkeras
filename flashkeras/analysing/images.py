@@ -1,4 +1,5 @@
 from flashkeras.utils.otherimports import *
+from flashkeras.utils.typehints import *
 from flashkeras.utils.typehints import BatchIterator
 
 def show_images_from_batch(batches: BatchIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
@@ -10,7 +11,7 @@ def show_images_from_batch(batches: BatchIterator, num_images: int = 1, fig_size
             images, labels = tuple_or_images
         except:
             images = tuple_or_images
-            
+
         for img in images:
             all_images.append(img)
         if batches.batch_index == 0: break
@@ -65,3 +66,18 @@ def show_images_from_directory(dir_path: str, num_images=1):
         plt.axis('off')
     
     plt.show()
+
+def show_image(image: Union[np.ndarray, Image.Image, str], fig_size: tuple[int, int] = (7,7)) -> Tuple[int, int]:
+    '''Provide the image or path to the image and shows it.
+    '''
+
+    if isinstance(image, str):
+        image = Image.open(image)
+
+    if isinstance(image, Image.Image):
+        image = np.array(image)
+
+    if isinstance(image, np.ndarray):
+        show_image_nparray(image, fig_size)
+    
+    raise ValueError("The image must be one of the following types: ``np.ndarray``, ``Image.Image`` or a ``str`` representing the path.")
