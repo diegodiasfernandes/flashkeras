@@ -7,3 +7,4 @@ import matplotlib.image as mpimg # type: ignore
 from sklearn.preprocessing import MinMaxScaler # type: ignore
 from sklearn.model_selection import train_test_split # type: ignore
 from sklearn.preprocessing import LabelEncoder # type: ignore
+from PIL import Image # type: ignore
