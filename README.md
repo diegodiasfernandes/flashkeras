@@ -47,7 +47,7 @@ from flashkeras.evaluation import FlashEvaluating as eval
 recall = eval.getRecall(flash, x_test, y_test)
 ```
 
-## Basic Pipeline and Sub-Divisions
+## Pipeline and Sub-Divisions
 FlashKeras is based on a basic machine learning pipeline, that being:
 - Data Colletion
 - Data Analysis
@@ -65,6 +65,22 @@ So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'e
 ### 2) Analyses: ``flashkeras.analysing``
 - Plotting images and Graphs
 - Matrixes
+
+```py
+from flashkeras.analysing.graphs.line_graphs import plot_multi_line_graph
+
+y1 = [0.1, 0.5, 0.8, 0.7, 0.9]
+y2 = [0.2, 0.4, 0.6, 0.9, 1.0]
+y3 = [0.3, 0.6, 0.4, 0.5, 0.8]
+
+plot_multi_line_graph(
+    [y1, y2, y3], 
+    graph_title='Multiple Line Graph Example', 
+    labels=['Real Data 1', 'Real Data 2', 'Real Data 3']
+)
+```
+
+![Multi-Line Graph](https://imgur.com/vqJPpjY.png)
 
 ### 3) Preprocessing: ``flashkeras.preprocessing``
 #### FlashPreProcessing
