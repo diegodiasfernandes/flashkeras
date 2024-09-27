@@ -62,6 +62,16 @@ So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'e
 - Get numpy array images
 - Get datasets from keras and sklearn s.a. iris, MNIST, ...
 
+```py
+from flashkeras.data_collecting import FlashDataGenerator as datagen
+from flashkeras.preprocessing import FlashPreProcessing as prep
+
+# In Order to use DirectoryIterators you must have directories inside the main dir
+img_shape = prep.getImageShape('data\\myImages\\image1.png')
+flash_gen = datagen(img_shape)
+image_batches = flash_gen.flow_images_from_directory('data')
+```
+
 ### 2) Analyses: ``flashkeras.analysing``
 - Plotting images and Graphs
 - Matrixes
