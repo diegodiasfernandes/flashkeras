@@ -79,7 +79,7 @@ So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'e
 
 Example:  
 ```py
-flash = FlashSequential()
+flash = FlashSequential('classification')
 flash.addDense(32, "relu")
 flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test), auto_output_layer=True)
 ```
