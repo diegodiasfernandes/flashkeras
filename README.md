@@ -89,9 +89,9 @@ plot_multi_line_graph(
 - Resizing
 
 ```py
-from flashkeras.preprocessing import FlashPreProcessing as prep
+>>> from flashkeras.preprocessing import FlashPreProcessing as prep
 
-classes = ['dog', 'dog', 'fish', 'dog' 'cat']
+>>> classes = ['dog', 'dog', 'fish', 'dog' 'cat']
 
 >>> classes_encoded, encoder = prep.labelEncoder(classes, True)
 >>> classes_encoded
