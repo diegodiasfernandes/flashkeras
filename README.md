@@ -26,7 +26,7 @@ show_images_nparray(x_train, num_images=5)
 # 3) preprocessing
 from flashkeras.preprocessing import FlashDataGenerator 
 flash_gen = FlashDataGenerator (
-    img_size=32, # resizing
+    img_shape=(32, 32), # resizing
     rotation_range=10 # rotating
 )
 
