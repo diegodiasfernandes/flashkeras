@@ -88,6 +88,20 @@ plot_multi_line_graph(
 - Converting and reshaping
 - Resizing
 
+```py
+from flashkeras.preprocessing import FlashPreProcessing as prep
+
+classes = ['dog', 'dog', 'fish', 'dog' 'cat']
+
+classes_encoded, encoder = prep.labelEncoder(classes, True)
+print(classes_encoded)
+>>> [0 0 2 1]
+
+class_decoded = prep.labelDecoder([2], encoder)
+print(class_decoded)
+>>> ['fish']
+```
+
 #### ``images.FlashDataGenerator``
 - Collect images from directory (directory batches)
 - Collect images from array (np.ndarray batches)
