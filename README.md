@@ -154,3 +154,8 @@ flash.addTransferLearning(mobile_net)
 #### FlashEvaluation
 - Accuracy, Recall, Precision, F1-Score
 - MSE, MEA
+
+```py
+from flashkeras.evaluation import FlashEvaluating as eval
+recall = eval.getRecall(flash, test_batches)
+```
