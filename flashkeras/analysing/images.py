@@ -5,7 +5,12 @@ def show_images_from_batch(batches: BatchIterator, num_images: int = 1, fig_size
     all_images = []
     images, labels = (None, None)
     while True:
-        images, labels = next(batches)
+        tuple_or_images = next(batches)
+        try:
+            images, labels = tuple_or_images
+        except:
+            images = tuple_or_images
+            
         for img in images:
             all_images.append(img)
         if batches.batch_index == 0: break
