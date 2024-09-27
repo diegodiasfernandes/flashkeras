@@ -57,11 +57,16 @@ FlashKeras is based on a basic machine learning pipeline, that being:
 
 So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'evaluation'.
 
-### ``flashkeras.analysing``
+### 1) Data Collection: ``flashkeras.data_collecting``
+- Get images from directories
+- Get numpy array images
+- Get datasets from keras and sklearn s.a. iris, MNIST, ...
+
+### 2) Analyses: ``flashkeras.analysing``
 - Plotting images and Graphs
 - Matrixes
 
-### ``flashkeras.preprocessing``
+### 3) Preprocessing: ``flashkeras.preprocessing``
 #### FlashPreProcessing
 - One-Hot-Encode
 - Converting and reshaping
@@ -73,7 +78,7 @@ So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'e
 - Applying Filters
 - Resizing and reshaping
 
-### ``flashkeras.models``
+### 4) Model Building: ``flashkeras.models``
 #### FlashSequential
 - Easier to use Sequential model.
 
@@ -115,7 +120,7 @@ mobile_net = flash_transfer.transferMobileNet()
 # add mobilenet to the flash sequential
 flash.addTransferLearning(mobile_net)
 ```
-### flashkeras.evaluation
+### 5) Evaluation: flashkeras.evaluation
 #### FlashEvaluation
 - Accuracy, Recall, Precision, F1-Score
 - MSE, MEA
