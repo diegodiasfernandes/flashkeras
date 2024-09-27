@@ -93,13 +93,13 @@ from flashkeras.preprocessing import FlashPreProcessing as prep
 
 classes = ['dog', 'dog', 'fish', 'dog' 'cat']
 
-classes_encoded, encoder = prep.labelEncoder(classes, True)
-print(classes_encoded)
->>> [0 0 2 1]
+>>> classes_encoded, encoder = prep.labelEncoder(classes, True)
+>>> classes_encoded
+[0 0 2 1]
 
-class_decoded = prep.labelDecoder([2], encoder)
-print(class_decoded)
->>> ['fish']
+>>> class_decoded = prep.labelDecoder([2], encoder)
+>>> class_decoded
+['fish']
 ```
 
 #### ``images.FlashDataGenerator``
