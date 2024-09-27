@@ -2,7 +2,7 @@ from flashkeras.utils.otherimports import *
 from sklearn.metrics import mean_squared_error # type: ignore
 
 def plot_line_graph(y_values: list, 
-                    x_values: list = None,
+                    x_values: list | None = None,
                     graph_title='Line Graph',
                     x_label='X', 
                     y_label='Y',
@@ -37,7 +37,7 @@ def plot_line_graph(y_values: list,
     plt.show()
 
 def plot_multi_line_graph(y_values: list[list], 
-                          x_values: list = None,
+                          x_values: list | None = None,
                           graph_title='Line Graph',
                           x_label='X', 
                           y_label='Y',
@@ -81,7 +81,7 @@ def plot_multi_line_graph(y_values: list[list],
     plt.show()
 
 def plot_line_graph_polynomial_fit_broken_y_axis(y_values: list, 
-                                               x_values: list = None,
+                                               x_values: list | None = None,
                                                max_degree=5, 
                                                focus_threshold=0.8,
                                                graph_title='Graph with Polynomial Regression & Y axis Cut',
@@ -162,7 +162,7 @@ def plot_line_graph_polynomial_fit_broken_y_axis(y_values: list,
     plt.show()
 
 def plot_line_graph_polynomial_fit(y_values: list, 
-                                   x_values: list = None,
+                                   x_values: list | None = None,
                                    max_degree=5, 
                                    graph_title='Graph with Polynomial Regression',
                                    x_label='X', 
