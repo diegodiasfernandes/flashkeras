@@ -17,7 +17,10 @@ class FlashSequential:
 
         self.output_activation: Literal["sigmoid", "softmax"] = "sigmoid"
         self.output_loss: str = "binary_crossentropy"
-        self.output_neurons: int = 1          
+        self.output_neurons: int = 1   
+
+        self.optimizer: Any = None
+        self.metrics: Any = None       
 
     def add(self, layer) -> None:       
         self._checkBlocked()
@@ -59,8 +62,11 @@ class FlashSequential:
             opt = self._optimizerMap(optimizer, learning_rate)
         else:
             opt = optimizer
-        
+
         self.model.compile(opt, loss, metrics)
+
+        self.optimizer = opt
+        self.metrics = metrics
 
     def build(self, 
               data: Union[np.ndarray, pd.DataFrame, BatchIterator], 
@@ -97,16 +103,16 @@ class FlashSequential:
             sample_weight: Any | None = None,
             initial_epoch: int = 0
             ) -> Any:
-
+        
         self.build(x, y, auto_output_layer)
 
         if not self.model._is_compiled:
             self.compile(loss=self.output_loss)
-
-        if self.model.loss is None:
+        
+        if not self.model.loss:
             self.compile(optimizer=self.model.optimizer,
                          loss=self.output_loss,
-                         metrics=self.model.metrics)
+                         metrics=self.metrics)
 
         if isinstance(x, (DirectoryIterator, NumpyArrayIterator)):
             history = self.model.fit(x, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch,
