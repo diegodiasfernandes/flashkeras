@@ -9,6 +9,8 @@ def plot_line_graph(y_values: list | np.ndarray,
                     y_label='Y',
                     x_rotation=90,
                     fig_size=(15, 6),
+                    x_ticks=None,
+                    y_ticks=None,
                     grid: bool = False
                     ):
 
@@ -24,12 +26,13 @@ def plot_line_graph(y_values: list | np.ndarray,
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    # Rotate x-axis labels for readability
-    plt.xticks(x_values, rotation=x_rotation)
+    if x_ticks is None:
+        x_ticks = x_values
+    plt.xticks(x_ticks, rotation=x_rotation)
 
-    # Set y-axis ticks to divide into 20 parts
-    y_min, y_max = min(y_values), max(y_values)
-    y_ticks = np.linspace(y_min, y_max, 20)
+    if y_ticks is None:
+        y_min, y_max = min(y_values), max(y_values)
+        y_ticks = np.linspace(y_min, y_max, 20)
     plt.yticks(y_ticks)
 
     # Disable grid, add legend, and show plot
@@ -45,6 +48,8 @@ def plot_multi_line_graph(y_values: list[list] | np.ndarray,
                           labels: list | None = None, 
                           x_rotation=90,
                           fig_size=(15, 6),
+                          x_ticks=None,
+                          y_ticks=None,
                           grid: bool = False
                           ):
     # Define x_values as default if not provided
@@ -67,13 +72,14 @@ def plot_multi_line_graph(y_values: list[list] | np.ndarray,
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    # Rotate x-axis labels for readability
-    plt.xticks(x_values, rotation=x_rotation)
+    if x_ticks is None:
+        x_ticks = x_values
+    plt.xticks(x_ticks, rotation=x_rotation)
 
-    # Set y-axis ticks to divide into 20 parts based on all y-values
-    all_y_values = np.concatenate(y_values)
-    y_min, y_max = min(all_y_values), max(all_y_values)
-    y_ticks = np.linspace(y_min, y_max, 20)
+    if y_ticks is None:
+        all_y_values = np.concatenate(y_values)
+        y_min, y_max = min(all_y_values), max(all_y_values)
+        y_ticks = np.linspace(y_min, y_max, 20)
     plt.yticks(y_ticks)
 
     # Show grid, add legend, and display the plot
@@ -90,6 +96,7 @@ def plot_line_graph_polynomial_fit_broken_y_axis(y_values: list | np.ndarray,
                                                y_label='Y',
                                                x_rotation=90,
                                                fig_size=(15, 6),
+                                               x_ticks=None,
                                                grid: bool = False
                                                ) -> None:
 
@@ -150,8 +157,10 @@ def plot_line_graph_polynomial_fit_broken_y_axis(y_values: list | np.ndarray,
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    # Rotate x-axis labels for readability
-    plt.xticks(x_values, rotation=x_rotation)
+    if x_ticks is None:
+        x_ticks = x_values
+        
+    plt.xticks(x_ticks, rotation=x_rotation)
 
     # Set y-axis limits to show only values above focus_threshold
     min_val, max_val = find_y_limits(y_values)
@@ -170,6 +179,8 @@ def plot_line_graph_polynomial_fit(y_values: list | np.ndarray,
                                    y_label='Y',
                                    x_rotation=90,
                                    fig_size=(15, 6),
+                                   x_ticks=None,
+                                   y_ticks=None,
                                    grid: bool = False
                                    ):
     
@@ -212,15 +223,16 @@ def plot_line_graph_polynomial_fit(y_values: list | np.ndarray,
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    # Rotate x-axis labels for readability
-    plt.xticks(x_values, rotation=x_rotation)
+    if x_ticks is None:
+        x_ticks = x_values
 
-    # Set y-axis ticks to divide into 20 parts
-    y_min, y_max = min(y_values), max(y_values)
-    y_ticks = np.linspace(y_min, y_max, 20)
+    plt.xticks(x_ticks, rotation=x_rotation)
+
+    if y_ticks is None:
+        y_min, y_max = min(y_values), max(y_values)
+        y_ticks = np.linspace(y_min, y_max, 20)
     plt.yticks(y_ticks)
 
     plt.grid(grid)
     plt.legend()
     plt.show()
-
