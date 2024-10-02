@@ -77,8 +77,8 @@ def get_line_graph(y_values: list | np.ndarray,
 
     return fig
 
-def plot_multi_line_graph(y_values: list[list] | np.ndarray, 
-                          x_values: list | Any = None,
+def plot_multi_line_graph(coords: list[list[list]], 
+                          x_values: list = None,
                           graph_title='Line Graph',
                           x_label='X', 
                           y_label='Y',
@@ -87,30 +87,32 @@ def plot_multi_line_graph(y_values: list[list] | np.ndarray,
                           fig_size=(15, 6),
                           x_ticks=None,
                           y_ticks=None,
-                          grid: bool = False
-                          ):
-    # Define x_values as default if not provided
+                          grid: bool = False):
+    """Plots multiple lines on the same graph with the given coordnates
+    
+    :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
+    :param labels: Names of the different lines.
+    """
+    
     if x_values is None:
-        x_values = np.arange(1, len(y_values[0]) + 1)
+        x_values = [list(zip(*coord))[0] for coord in coords]
+    
+    y_values = [list(zip(*coord))[1] for coord in coords]
 
-    # Create figure for plotting
     plt.figure(figsize=fig_size)
 
-    # If no labels provided, create default labels for each line
     if labels is None:
-        labels = [f'Line {i+1}' for i in range(len(y_values))]
+        labels = [f'Line {i+1}' for i in range(len(coords))]
 
-    # Plot each line with a different color
-    for i, y in enumerate(y_values):
-        plt.plot(x_values, y, marker='o', linestyle='-', label=labels[i])
+    for i, (x, y) in enumerate(zip(x_values, y_values)):
+        plt.plot(x, y, marker='o', linestyle='-', label=labels[i])
 
-    # Add titles and labels
     plt.title(graph_title)
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
     if x_ticks is None:
-        x_ticks = x_values
+        x_ticks = np.concatenate(x_values)
     plt.xticks(x_ticks, rotation=x_rotation)
 
     if y_ticks is None:
@@ -119,14 +121,14 @@ def plot_multi_line_graph(y_values: list[list] | np.ndarray,
         y_ticks = np.linspace(y_min, y_max, 20)
     plt.yticks(y_ticks)
 
-    # Show grid, add legend, and display the plot
     plt.grid(grid)
     plt.legend()
+
     plt.show()
 
-def get_multi_line_graph(y_values: list[list] | np.ndarray, 
-                         x_values: list | Any = None,
-                         graph_title='Multi Line Graph',
+def get_multi_line_graph(coords: list[list[list]], 
+                         x_values: list = None,
+                         graph_title='Line Graph',
                          x_label='X', 
                          y_label='Y',
                          labels: list | None = None, 
@@ -135,30 +137,180 @@ def get_multi_line_graph(y_values: list[list] | np.ndarray,
                          x_ticks=None,
                          y_ticks=None,
                          grid: bool = False):
+    """Generate a multi-lines graph with the given coordnates and returns it
+    
+    :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
+    :param labels: Names of the different lines.
+    """
     
     if x_values is None:
-        x_values = np.arange(1, len(y_values[0]) + 1)
+        x_values = [list(zip(*coord))[0] for coord in coords]
+    
+    y_values = [list(zip(*coord))[1] for coord in coords]
 
     fig, ax = plt.subplots(figsize=fig_size)
 
     if labels is None:
-        labels = [f'Line {i+1}' for i in range(len(y_values))]
+        labels = [f'Line {i+1}' for i in range(len(coords))]
 
-    for i, y in enumerate(y_values):
-        ax.plot(x_values, y, marker='o', linestyle='-', label=labels[i])
+    for i, (x, y) in enumerate(zip(x_values, y_values)):
+        ax.plot(x, y, marker='o', linestyle='-', label=labels[i])
 
     ax.set_title(graph_title)
     ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
 
     if x_ticks is None:
-        x_ticks = x_values
+        x_ticks = np.concatenate(x_values)
     ax.set_xticks(x_ticks)
     ax.tick_params(axis='x', rotation=x_rotation)
 
     if y_ticks is None:
         all_y_values = np.concatenate(y_values)
         y_min, y_max = min(all_y_values), max(all_y_values)
+        y_ticks = np.linspace(y_min, y_max, 20)
+    ax.set_yticks(y_ticks)
+
+    ax.grid(grid)
+    ax.legend()
+
+    return fig
+
+def plot_multi_line_graph_polynomial_fit(coords: list[list[list]], 
+                          max_degree=5,
+                          graph_title='Line Graph',
+                          x_label='X', 
+                          y_label='Y',
+                          labels: list | None = None, 
+                          x_rotation=90,
+                          fig_size=(15, 6),
+                          x_ticks=None,
+                          y_ticks=None,
+                          grid: bool = False):
+    """Plots multiple lines on the same graph with the given coordnates and also plots the polynomial regression of all the points.
+    
+    :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
+    :param labels: Names of the different lines.
+    """
+    
+    def find_best_polynomial_degree(x, y, max_degree):
+        best_degree = 1
+        best_error = float('inf')
+
+        for degree in range(1, max_degree + 1):
+            coefficients = np.polyfit(x, y, degree)
+            polynomial = np.poly1d(coefficients)
+            y_pred = polynomial(x)
+            error = mean_squared_error(y, y_pred)
+
+            if error < best_error:
+                best_error = error
+                best_degree = degree
+
+        return best_degree
+    
+    x_values_flat = np.concatenate([list(zip(*coord))[0] for coord in coords])
+    y_values_flat = np.concatenate([list(zip(*coord))[1] for coord in coords])
+
+    plt.figure(figsize=fig_size)
+
+    best_degree = find_best_polynomial_degree(x_values_flat, y_values_flat, max_degree)
+
+    coefficients = np.polyfit(x_values_flat, y_values_flat, best_degree)
+    polynomial = np.poly1d(coefficients)
+    regression_y_values = polynomial(np.sort(x_values_flat))
+
+    if labels is None:
+        labels = [f'Line {i+1}' for i in range(len(coords))]
+
+    for i, coord in enumerate(coords):
+        x, y = zip(*coord)
+        plt.plot(x, y, marker='o', linestyle='-', label=labels[i])
+
+    plt.plot(np.sort(x_values_flat), regression_y_values, linewidth=3, linestyle='--', color='b', label=f'Regression (Degree {best_degree})')
+
+    plt.title(graph_title)
+    plt.xlabel(x_label)
+    plt.ylabel(y_label)
+
+    if x_ticks is None:
+        x_ticks = np.sort(np.unique(x_values_flat))
+    plt.xticks(x_ticks, rotation=x_rotation)
+
+    if y_ticks is None:
+        y_min, y_max = min(y_values_flat), max(y_values_flat)
+        y_ticks = np.linspace(y_min, y_max, 20)
+    plt.yticks(y_ticks)
+
+    plt.grid(grid)
+    plt.legend()
+
+    plt.show()
+
+def get_multi_line_graph_polynomial_fit(coords: list[list[list]], 
+                          max_degree=5,
+                          graph_title='Line Graph',
+                          x_label='X', 
+                          y_label='Y',
+                          labels: list | None = None, 
+                          x_rotation=90,
+                          fig_size=(15, 6),
+                          x_ticks=None,
+                          y_ticks=None,
+                          grid: bool = False):
+    """Generate a multi-lines graph with the given coordnates and a polynomial regression and returns it
+    
+    :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
+    :param labels: Names of the different lines.
+    """
+    
+    def find_best_polynomial_degree(x, y, max_degree):
+        best_degree = 1
+        best_error = float('inf')
+
+        for degree in range(1, max_degree + 1):
+            coefficients = np.polyfit(x, y, degree)
+            polynomial = np.poly1d(coefficients)
+            y_pred = polynomial(x)
+            error = mean_squared_error(y, y_pred)
+
+            if error < best_error:
+                best_error = error
+                best_degree = degree
+
+        return best_degree
+    
+    x_values_flat = np.concatenate([list(zip(*coord))[0] for coord in coords])
+    y_values_flat = np.concatenate([list(zip(*coord))[1] for coord in coords])
+
+    fig, ax = plt.subplots(figsize=fig_size)
+
+    best_degree = find_best_polynomial_degree(x_values_flat, y_values_flat, max_degree)
+
+    coefficients = np.polyfit(x_values_flat, y_values_flat, best_degree)
+    polynomial = np.poly1d(coefficients)
+    regression_y_values = polynomial(np.sort(x_values_flat))
+
+    if labels is None:
+        labels = [f'Line {i+1}' for i in range(len(coords))]
+
+    for i, coord in enumerate(coords):
+        x, y = zip(*coord)
+        ax.plot(x, y, marker='o', linestyle='-', label=labels[i])
+
+    ax.plot(np.sort(x_values_flat), regression_y_values, linewidth=3, linestyle='--', color='b', label=f'Regression (Degree {best_degree})')
+
+    ax.set_title(graph_title)
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+
+    if x_ticks is None:
+        x_ticks = np.sort(np.unique(x_values_flat))
+    ax.set_xticks(x_ticks)
+    ax.tick_params(axis='x', rotation=x_rotation)
+
+    if y_ticks is None:
+        y_min, y_max = min(y_values_flat), max(y_values_flat)
         y_ticks = np.linspace(y_min, y_max, 20)
     ax.set_yticks(y_ticks)
 
