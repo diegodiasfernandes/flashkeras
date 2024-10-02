@@ -48,8 +48,6 @@ class FlashSequential:
                 loss: Any | None = None,
                 metrics: Any = None,
                 ) -> None:
-        
-        if loss is None: raise ValueError("loss value must be provided, cannt be ``None``")
 
         if metrics is None:
             if self.task == 'classification':
@@ -104,6 +102,11 @@ class FlashSequential:
 
         if not self.model._is_compiled:
             self.compile(loss=self.output_loss)
+
+        if self.model.loss is None:
+            self.compile(optimizer=self.model.optimizer,
+                         loss=self.output_loss,
+                         metrics=self.model.metrics)
 
         if isinstance(x, (DirectoryIterator, NumpyArrayIterator)):
             history = self.model.fit(x, epochs=epochs, validation_data=validation_data, steps_per_epoch=steps_per_epoch,
