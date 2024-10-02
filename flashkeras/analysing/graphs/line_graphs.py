@@ -186,7 +186,9 @@ def plot_multi_line_graph_polynomial_fit(coords: list[list[list]],
                           fig_size=(15, 6),
                           x_ticks=None,
                           y_ticks=None,
-                          grid: bool = False):
+                          grid: bool = False,
+                          regression_line_color='black'
+                          ):
     """Plots multiple lines on the same graph with the given coordnates and also plots the polynomial regression of all the points.
     
     :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
@@ -227,7 +229,7 @@ def plot_multi_line_graph_polynomial_fit(coords: list[list[list]],
         x, y = zip(*coord)
         plt.plot(x, y, marker='o', linestyle='-', label=labels[i])
 
-    plt.plot(np.sort(x_values_flat), regression_y_values, linewidth=3, linestyle='--', color='b', label=f'Regression (Degree {best_degree})')
+    plt.plot(np.sort(x_values_flat), regression_y_values, linewidth=3, linestyle='--', color=regression_line_color, label=f'Regression (Degree {best_degree})')
 
     plt.title(graph_title)
     plt.xlabel(x_label)
