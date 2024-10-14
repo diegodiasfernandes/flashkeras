@@ -214,9 +214,7 @@ class FlashSequential:
         if self.task == 'classification':
             sparse_or_not: str = ""
             if y is not None:
-                if isinstance(y, pd.Series):
-                    num_classes = len(y.unique())
-                elif isinstance(y, np.ndarray):
+                if isinstance(y, (pd.Series, np.ndarray)):
                     if y.ndim == 1:
                         sparse_or_not += "sparse_"
                         num_classes = len(np.unique(y))
