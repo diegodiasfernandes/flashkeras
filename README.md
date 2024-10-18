@@ -1,11 +1,11 @@
 # FlashKeras
 
 ## Installation
-Download it directly from Pypi:
+Download it directly from PyPi:
 ````
 pip install flashkeras
 ````
-Download it from github:
+Download it from GitHub:
 ````
 pip install git+https://github.com/diegodiasfernandes/flashkeras.git 
 ````
