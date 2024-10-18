@@ -1,10 +1,15 @@
 # FlashKeras
 
 ## Installation
+Download it directly from PyPi:
+````
+pip install flashkeras
+````
+Download it from GitHub:
 ````
 pip install git+https://github.com/diegodiasfernandes/flashkeras.git 
 ````
-Note that `pip install git+https://github.com/diegodiasfernandes/flashkeras.git` would also install `tensorflow`, `matplotlib`, `opencv-python`, `pandas` and ``scikit-learn``.
+Note that it would also install `tensorflow`, `matplotlib`, `opencv-python`, `pandas` and ``scikit-learn``.
 
 ## Why FlashKeras
 keras is one of the best machine learning libraries, but it is super *Dense*. So, ``FlashKeras`` was made to speed up your coding using pre-generated functions.
@@ -86,7 +91,7 @@ y3 = [0.3, 0.6, 0.4, 0.5, 0.8]
 plot_multi_line_graph(
     [y1, y2, y3], 
     graph_title='Multiple Line Graph Example', 
-    labels=['Real Data 1', 'Real Data 2', 'Real Data 3']
+    line_labels=['Real Data 1', 'Real Data 2', 'Real Data 3']
 )
 ```
 
