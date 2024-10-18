@@ -82,7 +82,7 @@ def plot_multi_line_graph(coords: list[list[list]],
                           graph_title='Line Graph',
                           x_label='X', 
                           y_label='Y',
-                          labels: list | None = None, 
+                          line_labels: list | None | Literal['default'] = None, 
                           x_rotation=90,
                           fig_size=(15, 6),
                           x_ticks=None,
@@ -101,11 +101,14 @@ def plot_multi_line_graph(coords: list[list[list]],
 
     plt.figure(figsize=fig_size)
 
-    if labels is None:
-        labels = [f'Line {i+1}' for i in range(len(coords))]
+    if line_labels == 'default':
+        line_labels = [f'Line {i+1}' for i in range(len(coords))]
 
     for i, (x, y) in enumerate(zip(x_values, y_values)):
-        plt.plot(x, y, marker='o', linestyle='-', label=labels[i])
+        if line_labels is not None:
+            plt.plot(x, y, marker='o', linestyle='-', label=line_labels[i])
+        else:
+            plt.plot(x, y, marker='o', linestyle='-')
 
     plt.title(graph_title)
     plt.xlabel(x_label)
@@ -131,7 +134,7 @@ def get_multi_line_graph(coords: list[list[list]],
                          graph_title='Line Graph',
                          x_label='X', 
                          y_label='Y',
-                         labels: list | None = None, 
+                         line_labels: list | None | Literal['default'] = None, 
                          x_rotation=90,
                          fig_size=(15, 6),
                          x_ticks=None,
@@ -150,11 +153,14 @@ def get_multi_line_graph(coords: list[list[list]],
 
     fig, ax = plt.subplots(figsize=fig_size)
 
-    if labels is None:
-        labels = [f'Line {i+1}' for i in range(len(coords))]
+    if line_labels == 'default':
+        line_labels = [f'Line {i+1}' for i in range(len(coords))]
 
     for i, (x, y) in enumerate(zip(x_values, y_values)):
-        ax.plot(x, y, marker='o', linestyle='-', label=labels[i])
+        if line_labels is not None:
+            plt.plot(x, y, marker='o', linestyle='-', label=line_labels[i])
+        else:
+            plt.plot(x, y, marker='o', linestyle='-')
 
     ax.set_title(graph_title)
     ax.set_xlabel(x_label)
@@ -181,7 +187,7 @@ def plot_multi_line_graph_polynomial_fit(coords: list[list[list]],
                           graph_title='Line Graph',
                           x_label='X', 
                           y_label='Y',
-                          labels: list | None = None, 
+                          line_labels: list | None | Literal['default'] = None, 
                           x_rotation=90,
                           fig_size=(15, 6),
                           x_ticks=None,
@@ -222,12 +228,15 @@ def plot_multi_line_graph_polynomial_fit(coords: list[list[list]],
     polynomial = np.poly1d(coefficients)
     regression_y_values = polynomial(np.sort(x_values_flat))
 
-    if labels is None:
-        labels = [f'Line {i+1}' for i in range(len(coords))]
+    if line_labels == 'default':
+        line_labels = [f'Line {i+1}' for i in range(len(coords))]
 
     for i, coord in enumerate(coords):
         x, y = zip(*coord)
-        plt.plot(x, y, marker='o', linestyle='-', label=labels[i])
+        if line_labels is not None:
+            plt.plot(x, y, marker='o', linestyle='-', label=line_labels[i])
+        else:
+            plt.plot(x, y, marker='o', linestyle='-')
 
     plt.plot(np.sort(x_values_flat), regression_y_values, linewidth=3, linestyle='--', color=regression_line_color, label=f'Regression (Degree {best_degree})')
 
@@ -254,7 +263,7 @@ def get_multi_line_graph_polynomial_fit(coords: list[list[list]],
                           graph_title='Line Graph',
                           x_label='X', 
                           y_label='Y',
-                          labels: list | None = None, 
+                          line_labels: list | None | Literal['default'] = None, 
                           x_rotation=90,
                           fig_size=(15, 6),
                           x_ticks=None,
@@ -293,12 +302,15 @@ def get_multi_line_graph_polynomial_fit(coords: list[list[list]],
     polynomial = np.poly1d(coefficients)
     regression_y_values = polynomial(np.sort(x_values_flat))
 
-    if labels is None:
-        labels = [f'Line {i+1}' for i in range(len(coords))]
+    if line_labels == 'default':
+        line_labels = [f'Line {i+1}' for i in range(len(coords))]
 
     for i, coord in enumerate(coords):
         x, y = zip(*coord)
-        ax.plot(x, y, marker='o', linestyle='-', label=labels[i])
+        if line_labels is not None:
+            plt.plot(x, y, marker='o', linestyle='-', label=line_labels[i])
+        else:
+            plt.plot(x, y, marker='o', linestyle='-')
 
     ax.plot(np.sort(x_values_flat), regression_y_values, linewidth=3, linestyle='--', color='b', label=f'Regression (Degree {best_degree})')
 
