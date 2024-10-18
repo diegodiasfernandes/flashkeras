@@ -91,7 +91,7 @@ y3 = [0.3, 0.6, 0.4, 0.5, 0.8]
 plot_multi_line_graph(
     [y1, y2, y3], 
     graph_title='Multiple Line Graph Example', 
-    labels=['Real Data 1', 'Real Data 2', 'Real Data 3']
+    line_labels=['Real Data 1', 'Real Data 2', 'Real Data 3']
 )
 ```
 
