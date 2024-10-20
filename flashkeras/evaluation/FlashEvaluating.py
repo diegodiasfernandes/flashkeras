@@ -2,7 +2,7 @@ from flashkeras.utils.otherimports import *
 from flashkeras.utils.kerasimports import *
 from flashkeras.utils.typehints import *
 from flashkeras.models import FlashSequential 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score, mean_squared_error, mean_absolute_error, f1_score, auc, roc_curve # type: ignore
+from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score, mean_squared_error, root_mean_squared_error, mean_absolute_error, f1_score, roc_curve # type: ignore
 
 class FlashEvaluating:
 
@@ -106,6 +106,60 @@ class FlashEvaluating:
         return recall_score(y_test, y_pred_classes, average='macro')
 
     @staticmethod
+    @overload
+    def getROC_AUC(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: ...
+    @staticmethod
+    @overload
+    def getROC_AUC(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
+    @staticmethod
+    def getROC_AUC(model: FlashSequential | Sequential, 
+                   x_test: Union[pd.DataFrame, np.ndarray, BatchIterator], 
+                   y_test: Union[pd.Series, np.ndarray, None] = None
+                   ) -> float:
+        """
+        Calculate the ROC AUC score of the given model on the test data.
+        
+        Parameters:
+        model (FlashSequential | Sequential): The model to evaluate.
+        x_test (Union[pd.DataFrame, np.ndarray, BatchIterator]): The test features.
+        y_test (Union[pd.Series, np.ndarray, None], optional): The true labels. Defaults to None.
+        
+        Returns:
+        float: The ROC AUC score.
+        """
+
+        y_test, y_pred_proba = FlashEvaluating._adjustClassMetrics(model, x_test, y_test)
+        
+        return roc_auc_score(y_test, y_pred_proba)
+
+    @staticmethod
+    @overload
+    def getF1Score(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: ...
+    @staticmethod
+    @overload
+    def getF1Score(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
+    @staticmethod
+    def getF1Score(model: FlashSequential | Sequential, 
+                   x_test: Union[pd.DataFrame, np.ndarray, BatchIterator], 
+                   y_test: Union[pd.Series, np.ndarray, None] = None
+                   ) -> float:
+        """
+        Calculate the F1 score of the given model on the test data.
+        
+        Parameters:
+        model (FlashSequential | Sequential): The model to evaluate.
+        x_test (Union[pd.DataFrame, np.ndarray, BatchIterator]): The test features.
+        y_test (Union[pd.Series, np.ndarray, None], optional): The true labels. Defaults to None.
+        
+        Returns:
+        float: The F1 score.
+        """
+
+        y_test, y_pred_classes = FlashEvaluating._adjustClassMetrics(model, x_test, y_test)
+        
+        return f1_score(y_test, y_pred_classes, average='macro')
+
+    @staticmethod
     def getMSE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray):
         if not isinstance(model, Sequential):
             true_model = model.model
@@ -114,6 +168,16 @@ class FlashEvaluating:
 
         y_pred = true_model.predict(x_test)
         return mean_squared_error(y_test, y_pred)
+    
+    @staticmethod
+    def getRMSE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray):
+        if not isinstance(model, Sequential):
+            true_model = model.model
+        else:
+            true_model = model
+
+        y_pred = true_model.predict(x_test)
+        return root_mean_squared_error(y_test, y_pred)
 
     @staticmethod
     def getMAE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray):
