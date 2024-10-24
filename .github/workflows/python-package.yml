@@ -34,7 +34,7 @@ jobs:
     #   run: |
     #     pytest
     - name: Build and publish to PyPI
-      if: github.ref == 'refs/heads/main' && matrix.python-version == '3.9'  # Apenas publica na branch main e com Python 3.9
+      if: github.ref == 'refs/heads/main' && matrix.python-version == '3.10'  # Apenas publica na branch main e com Python 3.9
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN_FK }}  # Use o novo segredo
