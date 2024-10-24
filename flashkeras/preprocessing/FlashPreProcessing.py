@@ -286,6 +286,34 @@ class FlashPreProcessing:
         return np.repeat(images, 3, axis=-1)
     
     @staticmethod
+    def normalize_pixels(img_arr_data: np.ndarray) -> np.ndarray:
+        """
+        Normalize images loaded in a numpy array to [0, 1] dividing the pixel's values by 255.0.
+        
+        Parameters
+        ----------
+        img_arr_data : np.ndarray
+            Array of images with shape (n_samples, height, width, channels) or (n_samples, height, width).
+        
+        Returns
+        -------
+        np.ndarray
+            Preprocessed array with shape (n_samples, height * width * channels).
+        """
+        if img_arr_data.ndim == 3:
+            n_samples, height, width = img_arr_data.shape
+            img_arr_data = img_arr_data.reshape((n_samples, height * width))
+        elif img_arr_data.ndim == 4:
+            n_samples, height, width, channels = img_arr_data.shape
+            img_arr_data = img_arr_data.reshape((n_samples, height * width * channels))
+        else:
+            raise ValueError("Unsupported input array shape.")
+
+        img_arr_data = img_arr_data.astype('float32') / 255.0
+        
+        return img_arr_data
+
+    @staticmethod
     def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1) -> np.ndarray:
         scaler = MinMaxScaler((min, max))
         return scaler.fit_transform(x)
