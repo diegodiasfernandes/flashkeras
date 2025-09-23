@@ -43,10 +43,42 @@ class FlashDataGenerator:
 
         return class_mode
 
-    def flow_images_from_directory(self,
-                                   directory_path: str,
-                                   batch_size: int = 32
-                                   ) -> DirectoryIterator:
+    def flow_images_from_directory(
+        self,
+        directory_path: str,
+        batch_size: int = 32
+        ) -> DirectoryIterator:
+        
+        """
+        Generates batches of augmented image data from a directory.
+        
+        *`Flash Explanation:`* This function helps you load images from a directory and 
+        apply a variety of image transformations like flipping, rotating, and zooming 
+        to create augmented versions of your images. It's useful when you want to feed 
+        images into a model for training, and you don't want to manually handle each 
+        image. The function automatically handles resizing and rescaling, and can even 
+        shuffle the images or leave them in order depending on your preference.
+
+        Args:
+        directory_path: string, path to the target directory containing image files.
+            The directory should contain images that will be augmented using the specified
+            parameters. Images will be rescaled, rotated, flipped, and zoomed based on
+            the settings in the `ImageDataGenerator`. The directory can also contain
+            subdirectories, which will be used to infer class labels for the images.
+        
+        batch_size: int, optional, default: 32.
+            The size of the batches of data to generate. The function will yield batches
+            of this size from the directory.
+
+        Returns:
+        A `DirectoryIterator` object that yields batches of augmented image data.
+        Each batch is a tuple `(x, y)` where:
+            - `x` is a numpy array containing a batch of images with shape
+            `(batch_size, *target_size, channels)`, with the images rescaled
+            and augmented according to the settings.
+            - `y` is `None`, since no labels are returned (useful for tasks like
+            unsupervised learning or inference).
+        """
         
         data_gen = ImageDataGenerator(
                     rescale=1./255,
