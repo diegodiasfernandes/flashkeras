@@ -206,6 +206,12 @@ class FlashSequential:
         else:
             return Adam()
         
+    def _array_of_unit_arrays(self, arr: np.ndarray | pd.Series) -> bool:
+        for subarray in arr:
+            if subarray.size != 1:
+                return False
+        return True
+
     def _setOutputParams(self,
                 y: Union[np.ndarray, pd.DataFrame, pd.Series, None] = None, 
                 image_batches: Optional[BatchIterator] = None, 
@@ -215,7 +221,7 @@ class FlashSequential:
             sparse_or_not: str = ""
             if y is not None:
                 if isinstance(y, (pd.Series, np.ndarray)):
-                    if y.ndim == 1:
+                    if y.ndim == 1 or self._array_of_unit_arrays(y):
                         sparse_or_not += "sparse_"
                         num_classes = len(np.unique(y))
                     elif y.ndim == 2:

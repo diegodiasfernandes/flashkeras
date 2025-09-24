@@ -78,7 +78,7 @@ def get_line_graph(y_values: list | np.ndarray,
     return fig
 
 def plot_multi_line_graph(coords: list[list[list]], 
-                          x_values: list = None,
+                          x_values: list | Any = None,
                           graph_title='Line Graph',
                           x_label='X', 
                           y_label='Y',
@@ -130,7 +130,7 @@ def plot_multi_line_graph(coords: list[list[list]],
     plt.show()
 
 def get_multi_line_graph(coords: list[list[list]], 
-                         x_values: list = None,
+                         x_values: list | Any = None,
                          graph_title='Line Graph',
                          x_label='X', 
                          y_label='Y',
@@ -552,7 +552,7 @@ def plot_line_graph_polynomial_fit(y_values: list | np.ndarray,
     plt.show()
 
 def get_line_graph_polynomial_fit(y_values: list | np.ndarray, 
-                                  x_values: list = None,
+                                  x_values: list | np.ndarray | None = None,
                                   max_degree=5, 
                                   graph_title='Graph with Polynomial Regression',
                                   x_label='X', 

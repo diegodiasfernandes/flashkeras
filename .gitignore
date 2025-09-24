@@ -163,3 +163,4 @@ cython_debug/
 flashtests.py
 data
 flashtests
+test.ipynb
