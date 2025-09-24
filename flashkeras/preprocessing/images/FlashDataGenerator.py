@@ -44,15 +44,16 @@ class FlashDataGenerator:
         return class_mode
 
     def flow_images_from_directory(
-        self,
-        directory_path: str,
-        batch_size: int = 32
+            self,
+            directory_path: str,
+            batch_size: int = 32
         ) -> DirectoryIterator:
         
         """
         Generates batches of augmented image data from a directory.
         
-        *`Flash Explanation:`* This function helps you load images from a directory and 
+        `Flash Explanation:` *`If you have images on a directory and want to apply preprocessing use this!`*
+        This function helps you load images from a directory and 
         apply a variety of image transformations like flipping, rotating, and zooming 
         to create augmented versions of your images. It's useful when you want to feed 
         images into a model for training, and you don't want to manually handle each 
@@ -100,11 +101,45 @@ class FlashDataGenerator:
 
         return image_iterator
 
-    def flow_classes_from_nparray(self, 
-                                  x: np.ndarray, 
-                                  y: np.ndarray | None = None,
-                                  batch_size: int = 32
-                                  ) -> NumpyArrayIterator:
+    def flow_images_from_nparray(
+        self, 
+        x: np.ndarray, 
+        y: np.ndarray | None = None,
+        batch_size: int = 32
+        ) -> NumpyArrayIterator:
+        
+        """
+        Generates batches of augmented image data from NumPy arrays.
+
+        `Flash Explanation:` *`If you have images as NumPy Array and want to apply preprocessing use this!`*
+        This function takes in raw image data in the form of NumPy arrays 
+        and returns an iterator that yields batches of images (and optionally labels), 
+        applying a variety of augmentations such as flipping, rotating, zooming, and brightness 
+        adjustments. It also resizes and rescales the input images automatically. This is 
+        especially useful when your images are already loaded into memory and you want to 
+        train a model without reading them from disk.
+
+        Args:
+        x: np.ndarray
+            NumPy array of input images. These can be grayscale or RGB images, and they will be 
+            automatically converted and resized based on the model’s expected input shape and 
+            color mode.
+
+        y: np.ndarray or None, optional, default: None
+            NumPy array of labels corresponding to the input images. If `None`, the iterator will 
+            yield batches of images only, without labels. This can be useful for inference or 
+            unsupervised tasks.
+
+        batch_size: int, optional, default: 32
+            Number of samples per batch to yield.
+
+        Returns:
+        A `NumpyArrayIterator` object that yields batches of augmented image data.
+        Each batch is a tuple `(x_batch, y_batch)` where:
+            - `x_batch` is a NumPy array of images with shape `(batch_size, *img_shape, channels)`, 
+            rescaled to [0, 1] and augmented as specified.
+            - `y_batch` is a NumPy array of labels, or `None` if no labels were provided.
+        """
         
         data_gen = ImageDataGenerator(
                     rescale=1./255,
@@ -126,12 +161,49 @@ class FlashDataGenerator:
 
         return batches
     
-    def flow_classes_from_nparray_test_split(self, 
-                                  x: np.ndarray, 
-                                  y: np.ndarray,
-                                  test_split: float = 0.2,
-                                  batch_size: int = 32
-                                  ) -> tuple[NumpyArrayIterator, NumpyArrayIterator]:
+    def flow_images_from_nparray_test_split(
+        self, 
+        x: np.ndarray, 
+        y: np.ndarray,
+        test_split: float = 0.2,
+        batch_size: int = 32
+        ) -> tuple[NumpyArrayIterator, NumpyArrayIterator]:
+        
+        """
+        Generates training and validation batches of augmented image data from NumPy arrays, with automatic test split.
+
+        `Flash Explanation:` *`If you have images as NumPy Array and want to apply preprocessing and test_split use this!`*
+        This function takes arrays of images and their corresponding class labels, 
+        applies preprocessing (such as resizing, color conversion, and normalization), and returns 
+        two iterators: one for training and one for validation. It uses Keras's internal splitting 
+        mechanism (`validation_split`) to divide the dataset and applies real-time data augmentation 
+        to improve generalization during training.
+
+        Args:
+        x: np.ndarray  
+            NumPy array of input images. The images will be resized and converted according to 
+            the model's expected input shape and color mode (`rgb` or `grayscale`).
+
+        y: np.ndarray  
+            NumPy array of class labels corresponding to each image in `x`. These labels will be 
+            automatically one-hot encoded to match the output format expected by most classification models.
+
+        test_split: float, optional, default: 0.2  
+            Fraction of the data to be used as validation. The value should be between 0 and 1.  
+            For example, `0.2` means 80% training and 20% validation.
+
+        batch_size: int, optional, default: 32  
+            Number of samples per batch to yield.
+
+        Returns:
+        A tuple of two `NumpyArrayIterator` objects:
+            - The first iterator yields batches of training data.
+            - The second iterator yields batches of validation (test) data.
+
+        Each batch is a tuple `(x_batch, y_batch)` where:
+            - `x_batch` is a NumPy array of shape `(batch_size, *img_shape, channels)`, rescaled to [0, 1] and augmented.
+            - `y_batch` is a one-hot encoded array of class labels corresponding to the images.
+        """
         
         data_gen = ImageDataGenerator(
                     rescale=1./255,
@@ -158,11 +230,55 @@ class FlashDataGenerator:
 
         return (train_batches, test_batches) 
 
-    def flow_all_classes_from_dir(
+    def flow_images_and_all_classes_from_dir(
             self,
             path_to_main_dir: str, 
             batch_size: int = 32
             ) -> DirectoryIterator | None:
+        
+        """
+        Generates batches of augmented image data directly from a directory structure.
+
+        `Flash Explanation:` *`Use this when your images are organized in folders per class and you want real-time augmentation!`*  
+        This function reads images from a main directory where each subdirectory represents a class. 
+        It applies real-time data augmentation and preprocessing to the images and yields batches suitable for training or evaluation.
+
+        This is particularly useful for large datasets that don't fit into memory, as images are loaded and processed in real-time during training.
+
+        Args:
+            path_to_main_dir: str  
+                Path to the main directory containing one subdirectory per class. Each subdirectory should contain images belonging to that class.  
+                Example structure:  
+                ```
+                path_to_main_dir/
+                    class_1/
+                        img001.jpg
+                        img002.jpg
+                    class_2/
+                        img003.jpg
+                        img004.jpg
+                ```
+
+            batch_size: int, optional, default: 32  
+                Number of images to yield per batch.
+
+        Returns:
+            DirectoryIterator or None  
+                An iterator over the dataset that yields batches `(x_batch, y_batch)`, where:  
+                    - `x_batch` is a batch of image data, rescaled to `[0, 1]` and augmented in real-time.  
+                    - `y_batch` is a batch of class labels in either one-hot or categorical format depending on the detected class mode (`'categorical'`, `'binary'`, `'sparse'`, etc.).  
+                Returns `None` if the class mode could not be determined or directory is invalid.
+
+        Details:
+            - Uses `ImageDataGenerator.flow_from_directory()` under the hood.
+            - Applies the following augmentations (configurable via class attributes):
+                - Horizontal flip
+                - Rotation
+                - Zoom
+                - Brightness adjustment
+                - Fill mode for new pixels after transformation
+            - Automatically infers class mode (`categorical`, `binary`, etc.) from directory structure via `_getClassMode()` helper.
+        """
         
         class_mode = self._getClassMode(path_to_main_dir)
         
@@ -186,12 +302,59 @@ class FlashDataGenerator:
 
         return batches
     
-    def flow_all_classes_from_dir_test_split(
+    def flow_images_and_all_classes_from_dir_test_split(
             self,
             path_to_main_dir: str,
             test_split: float = 0.2, 
             batch_size: int = 32
             ) -> tuple[DirectoryIterator, DirectoryIterator] | None:
+
+        """
+        Generates training and validation batches of augmented image data from a directory, using automatic test split.
+
+        `Flash Explanation:` *`Use this when your images are in folders by class and you want to split them automatically into training and validation sets with augmentation!`*  
+        This function reads images from a directory where each subfolder represents a class. It uses Keras's internal `validation_split` mechanism to automatically separate the data into training and validation sets. Augmentations and preprocessing are applied in real time.
+
+        Args:
+            path_to_main_dir: str  
+                Path to the main directory containing class-named subdirectories with images.  
+                Example structure:  
+                ```
+                path_to_main_dir/
+                    class_1/
+                        img001.jpg
+                        img002.jpg
+                    class_2/
+                        img003.jpg
+                        img004.jpg
+                ```
+
+            test_split: float, optional, default: 0.2  
+                Fraction of the data to reserve for validation. Must be a float between 0 and 1.  
+                For example, `0.2` means 80% training and 20% validation.
+
+            batch_size: int, optional, default: 32  
+                Number of samples per batch.
+
+        Returns:
+            tuple of DirectoryIterator or None  
+                A tuple `(train_batches, test_batches)` where each element is a `DirectoryIterator` that yields batches in the format `(x_batch, y_batch)`, with:
+                - `x_batch`: A batch of preprocessed and augmented image data (rescaled to `[0, 1]`).
+                - `y_batch`: Corresponding class labels in a format based on the inferred `class_mode` (`'categorical'`, `'binary'`, etc.).
+
+                Returns `None` if class mode inference fails or the directory is invalid.
+
+        Details:
+            - Uses `ImageDataGenerator.flow_from_directory()` with `subset='training'` and `subset='validation'`.
+            - Enables real-time data augmentation during both training and validation phases.
+            - Applies the following augmentations (controlled by class attributes):
+                - Horizontal flipping
+                - Rotation
+                - Zoom
+                - Brightness adjustment
+                - Custom fill mode for transformations
+            - Class mode (`categorical`, `binary`, or `sparse`) is determined automatically via `_getClassMode()` helper.
+        """
 
         class_mode = self._getClassMode(path_to_main_dir)
 
@@ -227,12 +390,59 @@ class FlashDataGenerator:
 
         return train_batches, test_batches
 
-    def flow_classes_from_dir(
+    def flow_images_and_classes_from_dir(
             self,
             path_to_main_dir: str, 
             classes: list[str], 
             batch_size: int = 32
             ) -> DirectoryIterator | None:
+        
+        """
+        Generates training batches of augmented image data from a directory, restricted to specific classes.
+
+        `Flash Explanation:` *`Use this when your images are organized in folders per class and you want real-time augmentation for some of the classes!`*  
+        This function reads images from a directory and restricts the loading to the user-specified classes. Each subfolder must represent a class. Real-time augmentations and preprocessing are applied during batch generation.
+
+        Args:
+            path_to_main_dir: str  
+                Path to the main directory containing subdirectories for each class.  
+                Example structure:  
+                ```
+                path_to_main_dir/
+                    class_1/
+                        img001.jpg
+                        img002.jpg
+                    class_2/
+                        img003.jpg
+                        img004.jpg
+                ```
+
+            classes: list[str]  
+                List of class subdirectory names to include.  
+                Example: `["class_1", "class_2"]`.  
+                Only these classes will be considered, even if more exist in the directory.
+
+            batch_size: int, optional, default: 32  
+                Number of samples per batch.
+
+        Returns:
+            DirectoryIterator or None  
+                A `DirectoryIterator` that yields batches in the format `(x_batch, y_batch)`, with:
+                - `x_batch`: Preprocessed and augmented images, rescaled to `[0, 1]`.
+                - `y_batch`: Class labels inferred from the `classes` list.
+
+                Returns `None` if class mode inference fails or directory is invalid.
+
+        Details:
+            - Uses `ImageDataGenerator.flow_from_directory()` with the `classes` argument to restrict data loading.
+            - Augmentations applied include:
+                - Horizontal flipping
+                - Rotation
+                - Zoom
+                - Brightness adjustment
+                - Custom fill mode for transformations
+            - `class_mode` is automatically determined by `_getClassMode()`.
+        """
         
         class_mode = self._getClassMode(classes)
         
@@ -257,13 +467,65 @@ class FlashDataGenerator:
 
         return batches
 
-    def flow_classes_from_dir_test_split(
+    def flow_images_and_classes_from_dir_test_split(
             self,
             path_to_main_dir: str, 
             classes: list[str],
             test_split: float = 0.2, 
             batch_size: int = 32
             ) -> tuple[DirectoryIterator, DirectoryIterator] | None:
+        
+        """
+        Generates training and validation batches of augmented image data from a directory, restricted to specific classes, using automatic test split.
+
+        `Flash Explanation:` *`Use this when your images are organized in folders per class and you want real-time augmentation for some of the classes! Also splitting the data into train and test!`*  
+        This function reads images from a directory, restricted to the given list of classes. It uses Keras' `validation_split` mechanism to separate data into training and validation sets. Augmentations and preprocessing are applied dynamically.
+
+        Args:
+            path_to_main_dir: str  
+                Path to the main directory containing subdirectories for each class.  
+                Example structure:  
+                ```
+                path_to_main_dir/
+                    class_1/
+                        img001.jpg
+                        img002.jpg
+                    class_2/
+                        img003.jpg
+                        img004.jpg
+                ```
+
+            classes: list[str]  
+                List of class subdirectory names to include.  
+                Example: `["class_1", "class_2"]`.
+
+            test_split: float, optional, default: 0.2  
+                Fraction of the data to reserve for validation. Must be between `0` and `1`.  
+                For example, `0.2` means 80% training and 20% validation.
+
+            batch_size: int, optional, default: 32  
+                Number of samples per batch.
+
+        Returns:
+            tuple of DirectoryIterator or None  
+                A tuple `(train_batches, test_batches)` where each element is a `DirectoryIterator` yielding `(x_batch, y_batch)`:
+                - `x_batch`: A batch of preprocessed and augmented image data (rescaled to `[0, 1]`).
+                - `y_batch`: Corresponding class labels restricted to the specified `classes`.
+
+                Returns `None` if class mode inference fails or directory is invalid.
+
+        Details:
+            - Uses `ImageDataGenerator.flow_from_directory()` with:
+                - `subset='training'` for training batches
+                - `subset='validation'` for validation batches
+            - Augmentations applied include:
+                - Horizontal flipping
+                - Rotation
+                - Zoom
+                - Brightness adjustment
+                - Custom fill mode for transformations
+            - `class_mode` is automatically determined by `_getClassMode()`.
+        """
         
         class_mode: str = self._getClassMode(classes)
         
