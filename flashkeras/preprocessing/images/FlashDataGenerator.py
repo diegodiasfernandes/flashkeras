@@ -5,9 +5,55 @@ from flashkeras.utils.filesutils import count_directories_in_directory
 from flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as prepro
 
 class FlashDataGenerator:
-    """ Loads and preprocess images from directories, numpy arrays
-    
     """
+    FlashDataGenerator
+
+    A utility class for loading, preprocessing, and applying real-time augmentations 
+    to image data from either directories or NumPy arrays, built on top of 
+    `keras.preprocessing.image.ImageDataGenerator`.
+
+    `Flash Explanation:` *`Use this class if you want an easy way to load and preprocess images for training or testing deep learning models!`*
+
+    ---
+    Parameters:
+        img_shape (tuple[int, int]):
+            Target size (height, width) for resizing all loaded images.
+
+        color_mode (Literal["rgb", "grayscale"], default="rgb"):
+            Color mode for loading images.
+            - `"rgb"`: 3-channel color images.
+            - `"grayscale"`: single-channel grayscale images.
+
+        horizontal_flip (bool, default=False):
+            Whether to randomly flip images horizontally during generation.
+
+        rotation_range (int, default=0):
+            Maximum degree range for random rotations. `0` means no rotation.
+
+        zoom_range (float, default=0):
+            Range for random zoom applied to images.
+
+        brightness_range (tuple[float, float] | None, default=None):
+            Range for random brightness adjustment. Example: `(0.8, 1.2)`.
+
+        fill_mode (str, default="nearest"):
+            Strategy for filling in newly created pixels after geometric transformations.  
+            Options: `"nearest"`, `"reflect"`, `"wrap"`, `"constant"`.
+    
+    ---
+    Examples:
+    >>> generator = FlashDataGenerator(img_shape=(224, 224), horizontal_flip=True, rotation_range=15)
+    
+    #### Load training images from directory
+    >>> train_batches = generator.flow_images_and_all_classes_from_dir("data/train", batch_size=32)
+    
+    #### Load training data from NumPy arrays
+    >>> batches = generator.flow_images_from_nparray(x_train, y_train, batch_size=64)
+    
+    #### Automatically create train/validation split from a directory
+    >>> train_batches, val_batches = generator.flow_images_and_all_classes_from_dir_test_split("data/train", test_split=0.2)
+    """
+
     def __init__(self,         
                     img_shape: tuple[int, int],
                     color_mode: Literal["rgb", "grayscale"] = "rgb",
