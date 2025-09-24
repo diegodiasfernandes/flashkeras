@@ -35,8 +35,8 @@ flash_gen = FlashDataGenerator (
     rotation_range=10 # rotating
 )
 
-train_batches = flash_gen.flow_classes_from_nparray(x_train, y_train)
-test_batches = flash_gen.flow_classes_from_nparray(x_test, y_test)
+train_batches = flash_gen.flow_images_from_nparray(x_train, y_train)
+test_batches = flash_gen.flow_images_from_nparray(x_test, y_test)
 
 # 4) model building
 from flashkeras.models.layers import *
