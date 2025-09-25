@@ -106,25 +106,23 @@ class FlashDataGenerator:
         image. The function automatically handles resizing and rescaling, and can even 
         shuffle the images or leave them in order depending on your preference.
 
-        Args:
-        directory_path: string, path to the target directory containing image files.
-            The directory should contain images that will be augmented using the specified
-            parameters. Images will be rescaled, rotated, flipped, and zoomed based on
-            the settings in the `ImageDataGenerator`. The directory can also contain
-            subdirectories, which will be used to infer class labels for the images.
-        
-        batch_size: int, optional, default: 32.
-            The size of the batches of data to generate. The function will yield batches
-            of this size from the directory.
+        Parameters:
+            directory_path: string, path to the target directory containing image files.
+                The directory should contain images that will be augmented using the specified
+                parameters. Images will be rescaled, rotated, flipped, and zoomed based on
+                the settings in the `ImageDataGenerator`. The directory can also contain
+                subdirectories, which will be used to infer class labels for the images.
+            
+            batch_size: int, optional, default: 32.
+                The size of the batches of data to generate. The function will yield batches
+                of this size from the directory.
 
         Returns:
         A `DirectoryIterator` object that yields batches of augmented image data.
         Each batch is a tuple `(x, y)` where:
-            - `x` is a numpy array containing a batch of images with shape
-            `(batch_size, *target_size, channels)`, with the images rescaled
-            and augmented according to the settings.
-            - `y` is `None`, since no labels are returned (useful for tasks like
-            unsupervised learning or inference).
+        
+            - `x` is a numpy array containing a batch of images with shape `(batch_size, target_size, channels)`, with the images rescaled and augmented according to the settings.
+            - `y` is `None`, since no labels are returned (useful for tasks like unsupervised learning or inference).
         """
         
         data_gen = ImageDataGenerator(
@@ -165,16 +163,18 @@ class FlashDataGenerator:
         especially useful when your images are already loaded into memory and you want to 
         train a model without reading them from disk.
 
-        Args:
-        x: np.ndarray
-            NumPy array of input images. These can be grayscale or RGB images, and they will be 
-            automatically converted and resized based on the model’s expected input shape and 
-            color mode.
+        Parameters:
+            x: np.ndarray
+                
+                NumPy array of input images. These can be grayscale or RGB images, and they will be 
+                automatically converted and resized based on the model's expected input shape and 
+                color mode.
 
-        y: np.ndarray or None, optional, default: None
-            NumPy array of labels corresponding to the input images. If `None`, the iterator will 
-            yield batches of images only, without labels. This can be useful for inference or 
-            unsupervised tasks.
+            y: np.ndarray or None, optional, default: None
+                
+                NumPy array of labels corresponding to the input images. If `None`, the iterator will 
+                yield batches of images only, without labels. This can be useful for inference or 
+                unsupervised tasks.
 
         batch_size: int, optional, default: 32
             Number of samples per batch to yield.
@@ -208,11 +208,11 @@ class FlashDataGenerator:
         return batches
     
     def flow_images_from_nparray_test_split(
-        self, 
-        x: np.ndarray, 
-        y: np.ndarray,
-        test_split: float = 0.2,
-        batch_size: int = 32
+            self, 
+            x: np.ndarray, 
+            y: np.ndarray,
+            test_split: float = 0.2,
+            batch_size: int = 32
         ) -> tuple[NumpyArrayIterator, NumpyArrayIterator]:
         
         """
@@ -225,21 +225,21 @@ class FlashDataGenerator:
         mechanism (`validation_split`) to divide the dataset and applies real-time data augmentation 
         to improve generalization during training.
 
-        Args:
-        x: np.ndarray  
-            NumPy array of input images. The images will be resized and converted according to 
-            the model's expected input shape and color mode (`rgb` or `grayscale`).
+        Parameters:
+            x: np.ndarray  
+                NumPy array of input images. The images will be resized and converted according to 
+                the model's expected input shape and color mode (`rgb` or `grayscale`).
 
-        y: np.ndarray  
-            NumPy array of class labels corresponding to each image in `x`. These labels will be 
-            automatically one-hot encoded to match the output format expected by most classification models.
+            y: np.ndarray  
+                NumPy array of class labels corresponding to each image in `x`. These labels will be 
+                automatically one-hot encoded to match the output format expected by most classification models.
 
-        test_split: float, optional, default: 0.2  
-            Fraction of the data to be used as validation. The value should be between 0 and 1.  
-            For example, `0.2` means 80% training and 20% validation.
+            test_split: float, optional, default: 0.2  
+                Fraction of the data to be used as validation. The value should be between 0 and 1.  
+                For example, `0.2` means 80% training and 20% validation.
 
-        batch_size: int, optional, default: 32  
-            Number of samples per batch to yield.
+            batch_size: int, optional, default: 32  
+                Number of samples per batch to yield.
 
         Returns:
         A tuple of two `NumpyArrayIterator` objects:
@@ -291,7 +291,7 @@ class FlashDataGenerator:
 
         This is particularly useful for large datasets that don't fit into memory, as images are loaded and processed in real-time during training.
 
-        Args:
+        Parameters:
             path_to_main_dir: str  
                 Path to the main directory containing one subdirectory per class. Each subdirectory should contain images belonging to that class.  
                 Example structure:  
@@ -361,7 +361,7 @@ class FlashDataGenerator:
         `Flash Explanation:` *`Use this when your images are in folders by class and you want to split them automatically into training and validation sets with augmentation!`*  
         This function reads images from a directory where each subfolder represents a class. It uses Keras's internal `validation_split` mechanism to automatically separate the data into training and validation sets. Augmentations and preprocessing are applied in real time.
 
-        Args:
+        Parameters:
             path_to_main_dir: str  
                 Path to the main directory containing class-named subdirectories with images.  
                 Example structure:  
@@ -449,7 +449,7 @@ class FlashDataGenerator:
         `Flash Explanation:` *`Use this when your images are organized in folders per class and you want real-time augmentation for some of the classes!`*  
         This function reads images from a directory and restricts the loading to the user-specified classes. Each subfolder must represent a class. Real-time augmentations and preprocessing are applied during batch generation.
 
-        Args:
+        Parameters:
             path_to_main_dir: str  
                 Path to the main directory containing subdirectories for each class.  
                 Example structure:  
@@ -527,7 +527,7 @@ class FlashDataGenerator:
         `Flash Explanation:` *`Use this when your images are organized in folders per class and you want real-time augmentation for some of the classes! Also splitting the data into train and test!`*  
         This function reads images from a directory, restricted to the given list of classes. It uses Keras' `validation_split` mechanism to separate data into training and validation sets. Augmentations and preprocessing are applied dynamically.
 
-        Args:
+        Parameters:
             path_to_main_dir: str  
                 Path to the main directory containing subdirectories for each class.  
                 Example structure:  
