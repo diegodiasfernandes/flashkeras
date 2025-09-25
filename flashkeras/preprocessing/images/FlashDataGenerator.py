@@ -197,9 +197,9 @@ class FlashDataGenerator:
                 )
         
         if self.color_mode == 'rgb':
-            x = prepro.convertNdArrayToRGB(x)
+            x = prepro.convertNumpyNdArrayToRGB(x)
         if self.color_mode == 'grayscale':
-            x = prepro.convertNdArrayToGrayScale(x)
+            x = prepro.convertNumpyNdArrayToGrayScale(x)
 
         x = prepro.resizeNpArray(x, self.img_shape[0], self.img_shape[1])
         
@@ -262,9 +262,9 @@ class FlashDataGenerator:
                 )
         
         if self.color_mode == 'rgb':
-            x = prepro.convertNdArrayToRGB(x)
+            x = prepro.convertNumpyNdArrayToRGB(x)
         if self.color_mode == 'grayscale':
-            x = prepro.convertNdArrayToGrayScale(x)
+            x = prepro.convertNumpyNdArrayToGrayScale(x)
     
         x = prepro.resizeNpArray(x, self.img_shape[0], self.img_shape[1])
         
