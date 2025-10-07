@@ -378,7 +378,7 @@ class FlashPreProcessing:
     def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator]) -> tuple:
     
         """
-        Infers the input shape of a dataset or iterator, supporting multiple data formats 
+        Infers the input shape of a dataset (features-only) or iterator, supporting multiple data formats 
         (NumPy arrays, Pandas DataFrames, and Keras data iterators).  
 
         `Flash Explanation:` *`Use this when you want to automatically detect the input shape 
@@ -392,7 +392,7 @@ class FlashPreProcessing:
                 (excluding the batch dimension).  
                 - **DirectoryIterator:** Returns `(height, width, 3)` assuming RGB images.  
                 - **NumPy array (1D or 2D)** or **Pandas DataFrame:** Returns `(n_features,)`, 
-                treating the data as tabular.  
+                treating the data as tabular. Remember to drop the label column for this.
                 - **NumPy array (3D or 4D):** Returns an image-like shape, either 
                 `(height, width, 1)` for grayscale or `(height, width, 3)` for RGB.  
 
