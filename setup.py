@@ -2,7 +2,7 @@ from setuptools import setup, find_packages # type: ignore
 
 setup(
     name="flashkeras",
-    version="0.1.7",
+    version="0.1.8",
     packages=find_packages(include=['flashkeras', 'flashkeras.*']),
     install_requires=[ 
         'tensorflow==2.15.0',
@@ -23,4 +23,13 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.10,<3.12',
+    include_package_data=True,
+    package_data={
+        "flashkeras.notebooks": ["templates/*.ipynb"],
+    },
+    entry_points={
+        "console_scripts": [
+            "flashkeras=flashkeras.__main__:main",
+        ],
+    }
 )
