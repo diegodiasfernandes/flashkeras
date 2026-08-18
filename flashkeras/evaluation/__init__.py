@@ -1,5 +1,12 @@
-from .FlashEvaluating import FlashEvaluating
+from flashkeras.evaluation.FlashEvaluating import getAccuracy, getF1Score, getMAE, getMSE, getPrecision, getRecall, getRMSE, getROC_AUC
 
 __all__ = [
-    'FlashEvaluating'
+    'getAccuracy',
+    'getF1Score',
+    'getMAE',
+    'getMSE',
+    'getPrecision',
+    'getRecall',
+    'getRMSE',
+    'getROC_AUC'
 ]

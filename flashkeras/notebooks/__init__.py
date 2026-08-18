@@ -16,7 +16,7 @@ from importlib import resources
 from pathlib import Path
 from typing import Any
 
-from ._catalog import NOTEBOOKS
+from flashkeras.notebooks._catalog import NOTEBOOKS
 
 __all__ = ["list_notebooks", "describe", "new_notebook"]
 
