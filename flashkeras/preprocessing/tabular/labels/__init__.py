@@ -1,4 +1,4 @@
-from encoding import ensureOneHotEncoding, labelEncoder, labelDecoder
+from flashkeras.preprocessing.tabular.labels.encoding import ensureOneHotEncoding, labelEncoder, labelDecoder
 
 __all__ = [
     'ensureOneHotEncoding', 

@@ -1,4 +1,5 @@
 from flashkeras.utils.typehints import *
+from flashkeras.utils import otherimports
 
 
 def train_test_split(*arrays: Any, 
@@ -91,5 +92,5 @@ def train_test_split(*arrays: Any,
     >>> train_test_split(y, shuffle=False)
     [[0, 1, 2], [3, 4]]
     """
-    return train_test_split(*arrays, test_size=test_split, random_state=random_state)
+    return otherimports.train_test_split(*arrays, test_size=test_split, random_state=random_state)
 

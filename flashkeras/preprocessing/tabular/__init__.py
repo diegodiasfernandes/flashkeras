@@ -1,4 +1,4 @@
-from splitting import train_test_split
+from flashkeras.preprocessing.tabular.splitting import train_test_split
 
 __all__ = [
     'train_test_split'
