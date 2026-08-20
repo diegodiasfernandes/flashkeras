@@ -43,9 +43,9 @@ from flashkeras.models.layers import *
 from flashkeras.models import FlashSequential
 flash = FlashSequential('classification')
 flash.add(Flatten())
-flash.add(keras.layers.Dense(64, activation="relu")) # It is also compatible with keras!
+flash.add(layers.Dense(64, activation="relu")) # It is also compatible with keras!
 flash.add(Dense(32, activation="elu"))
-flash.fit(train_batches=train_batches, epochs=15, validation=test_batches, auto_output_layer=True)
+flash.fit(x=train_batches, epochs=15, validation_data=test_batches, auto_output_layer=True)
 
 # 5) evaluating
 from flashkeras.evaluation import FlashEvaluating as eval
