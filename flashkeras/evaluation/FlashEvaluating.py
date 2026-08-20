@@ -14,7 +14,15 @@ def _adjustClassMetrics(model: FlashSequential | Sequential,
     else:
         true_model = model
 
-    if isinstance(x_test, (DirectoryIterator, NumpyArrayIterator)):
+    if isinstance(x_test, DirectoryIterator):
+        y_test = x_test.classes
+
+        y_pred = true_model.predict(x_test)
+        y_pred_classes = np.argmax(y_pred, axis=-1)
+
+        return y_test, y_pred_classes
+
+    if isinstance(x_test, NumpyArrayIterator):
         x_list = [x for x, _ in x_test]
         y_list = [y for _, y in x_test]
         x_test = np.concatenate(x_list, axis=0)
