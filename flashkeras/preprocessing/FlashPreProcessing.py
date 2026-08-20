@@ -452,7 +452,7 @@ class FlashPreProcessing:
             return data.x.shape[1:]
 
         if isinstance(data, DirectoryIterator):
-            return (data.target_size[0], data.target_size[1], 3)
+            return data.image_shape
 
         if ((isinstance(data, np.ndarray) and data.ndim < 3) or isinstance(data, pd.DataFrame)):
             temp_data = data
