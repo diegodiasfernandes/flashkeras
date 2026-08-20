@@ -230,8 +230,16 @@ class FlashSequential:
             elif image_batches is not None:
                 if isinstance(image_batches, DirectoryIterator):
                     num_classes = image_batches.num_classes
+                    if getattr(image_batches, "class_mode", "categorical") == "sparse":
+                        sparse_or_not += "sparse_"
+
                 elif isinstance(image_batches, NumpyArrayIterator):
-                    num_classes = len(image_batches.y[0])
+                    iterator_y = image_batches.y
+                    if iterator_y.ndim == 1 or self._array_of_unit_arrays(iterator_y):
+                        sparse_or_not += "sparse_"
+                        num_classes = len(np.unique(iterator_y))
+                    elif iterator_y.ndim == 2:
+                        num_classes = iterator_y.shape[1]
             else:
                 raise ValueError("Either x or y must be provided.")
             
