@@ -1,0 +1,28 @@
+site_name: FlashKeras
+site_description: Documentation for the FlashKeras Python library
+site_author: Diego Dias Fernandes
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - search.highlight
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+
+nav:
+  - Home: index.md
+  - Analysing: analysing.md
+  - Data Collecting: data_collecting.md
+  - Evaluation: evaluation.md
+  - Models: models.md
+  - Preprocessing: preprocessing.md
+  - Utils: utils.md
