@@ -1,6 +1,47 @@
-from pandas import read_csv, read_table
+from .datasets import (
+    load_wine,
+    load_breast_cancer,
+    load_diabetes,
+    load_iris,
+    boston_housing_load_data,
+    load_cifar100,
+    load_mnist,
+    load_cifar10,
+    load_fashion_mnist,
+    load_digits,
+    load_imdb,
+    imdb_get_world_index,
+    load_reuters,
+    reuters_get_word_index,
+    reuters_get_label_names,
+)
+from .images import (
+    load_all_classes_from_directory_and_preprocess,
+    load_all_classes_from_directory_and_preprocess_test_split,
+    load_classes_from_directory_and_preprocess,
+    load_classes_from_directory_and_preprocess_test_split,
+    load_from_directory_and_preprocess,
+)
 
 __all__ = [
-    'read_csv',
-    'read_table'
+    'load_wine',
+    'load_breast_cancer',
+    'load_diabetes',
+    'load_iris',
+    'boston_housing_load_data',
+    'load_cifar100',
+    'load_mnist',
+    'load_cifar10',
+    'load_fashion_mnist',
+    'load_digits',
+    'load_imdb',
+    'imdb_get_world_index',
+    'load_reuters',
+    'reuters_get_word_index',
+    'reuters_get_label_names',
+    'load_from_directory_and_preprocess',
+    'load_all_classes_from_directory_and_preprocess',
+    'load_all_classes_from_directory_and_preprocess_test_split',
+    'load_classes_from_directory_and_preprocess',
+    'load_classes_from_directory_and_preprocess_test_split',
 ]

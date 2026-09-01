@@ -67,8 +67,8 @@ img_gen = FlashDataGenerator(
     rotation_range=10,
 )
 
-train_batches = img_gen.flow_images_from_nparray(x_train, y_train)
-test_batches = img_gen.flow_images_from_nparray(x_test, y_test)
+train_batches = img_gen.preprocess_images_from_nparray(x_train, y_train)
+test_batches = img_gen.preprocess_images_from_nparray(x_test, y_test)
 
 # Model creation
 model = FlashSequential("classification")
