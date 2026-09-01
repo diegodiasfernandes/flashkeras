@@ -7,7 +7,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_a
 def _adjustClassMetrics(model: FlashSequential | Sequential, 
                         x_test: pd.DataFrame | np.ndarray | BatchIterator, 
                         y_test: pd.Series | np.ndarray | None = None
-                        ) -> tuple[pd.Series | np.ndarray, Any]:
+                        ) -> tuple[pd.Series | np.ndarray | Any, Any]:
 
     if not isinstance(model, Sequential):
         true_model = model.model
@@ -15,12 +15,13 @@ def _adjustClassMetrics(model: FlashSequential | Sequential,
         true_model = model
 
     if isinstance(x_test, DirectoryIterator):
-        y_test = x_test.classes
+        y_true = x_test.classes
+        assert y_true is not None
 
         y_pred = true_model.predict(x_test)
         y_pred_classes = np.argmax(y_pred, axis=-1)
 
-        return y_test, y_pred_classes
+        return y_true, y_pred_classes
 
     if isinstance(x_test, NumpyArrayIterator):
         x_list = [x for x, _ in x_test]
