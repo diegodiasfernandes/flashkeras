@@ -1,176 +1,244 @@
 # FlashKeras
 
+FlashKeras is a lightweight Python toolkit built on top of Keras to accelerate common deep learning and ML workflows, especially around image processing, preprocessing, model creation, and evaluation.
+
+The project was designed to reduce boilerplate and keep the workflow close to a clear machine learning pipeline: data collection, analysis, preprocessing, model building, and evaluation.
+
+## Why use FlashKeras?
+
+Keras is powerful, but it can feel verbose for everyday experiments and quick prototypes. FlashKeras focuses on:
+
+- Faster setup for standard ML workflows
+- Cleaner organization by pipeline stage
+- Simple abstractions for common tasks
+- Practical utilities for image data and tabular data
+- Compatibility with TensorFlow/Keras workflows
+
+## Main idea
+
+Instead of forcing users to manually assemble each part of a pipeline, FlashKeras organizes the library into modular blocks that reflect how real ML projects are usually structured:
+
+- `flashkeras.data_collecting` — data import and dataset utilities
+- `flashkeras.analysing` — visualization and inspection helpers
+- `flashkeras.preprocessing` — normalization, encoding, reshaping, resizing
+- `flashkeras.models` — simplified sequential modeling and transfer learning
+- `flashkeras.evaluation` — metrics and evaluation tools
+- `flashkeras.utils` — reusable helpers and internal utilities
+
+This keeps the library easy to understand, easy to extend, and aligned with a practical ML workflow.
+
 ## Installation
-Download it directly from PyPi:
-````
+
+Install from PyPI:
+
+```bash
 pip install flashkeras
-````
-Download it from GitHub:
-````
-pip install git+https://github.com/diegodiasfernandes/flashkeras.git 
-````
-Note that it would also install `tensorflow`, `matplotlib`, `opencv-python`, `pandas` and ``scikit-learn``.
-
-## Why FlashKeras
-keras is one of the best machine learning libraries, but it is super *Dense*. So, ``FlashKeras`` was made to speed up your coding using pre-generated functions.
-
-Also, FlashKeras makes use of a begginer-friendly organization that is also educative, since its modules are organized based on a machine learning pipeline (data colletion, analyses, preprocessing, model building and evaluation).
-
-## Basic Example
-
-Usage example:  
-```py
-# 1) collecting data
-from flashkeras.data_collecting.datasets import load_mnist
-(x_train, y_train), (x_test, y_test) = load_mnist()
-
-# 2) analysing
-from flashkeras.analysing import show_images_nparray
-show_images_nparray(x_train, num_images=5)
-
-# 3) preprocessing
-from flashkeras.preprocessing import FlashDataGenerator 
-flash_gen = FlashDataGenerator (
-    img_shape=(32, 32), # resizing
-    rotation_range=10 # rotating
-)
-
-train_batches = flash_gen.flow_images_from_nparray(x_train, y_train)
-test_batches = flash_gen.flow_images_from_nparray(x_test, y_test)
-
-# 4) model building
-from flashkeras.models.layers import *
-from flashkeras.models import FlashSequential
-flash = FlashSequential('classification')
-flash.add(Flatten())
-flash.add(layers.Dense(64, activation="relu")) # It is also compatible with keras!
-flash.add(Dense(32, activation="elu"))
-flash.fit(x=train_batches, epochs=15, validation_data=test_batches, auto_output_layer=True)
-
-# 5) evaluating
-from flashkeras.evaluation import FlashEvaluating as eval
-recall = eval.getRecall(flash, x_test, y_test)
 ```
 
-## Pipeline and Sub-Divisions
-FlashKeras is based on a basic machine learning pipeline, that being:
-- Data Colletion
-- Data Analysis
-- Pre Processing
-- Model Building
-- Evaluation
+Install directly from GitHub:
 
-So, the modules presented here are 'analysing', 'models', 'preprocessing' and 'evaluation'.
-
-### 1) Data Collection: ``flashkeras.data_collecting``
-- Get images from directories
-- Get numpy array images
-- Get datasets from keras and sklearn s.a. iris, MNIST, ...
-
-```py
-from flashkeras.data_collecting import FlashDataGenerator as datagen
-from flashkeras.preprocessing import FlashPreProcessing as prep
-
-# In Order to use DirectoryIterators you must have directories inside the main dir
-img_shape = prep.getImageShape('data\\myImages\\image1.png')
-flash_gen = datagen(img_shape)
-image_batches = flash_gen.flow_images_from_directory('data')
+```bash
+pip install git+https://github.com/diegodiasfernandes/flashkeras.git
 ```
 
-### 2) Analyses: ``flashkeras.analysing``
-- Plotting images and Graphs
-- Matrixes
+This package depends on:
 
-```py
-from flashkeras.analysing.graphs.line_graphs import plot_multi_line_graph
+- TensorFlow
+- Matplotlib
+- OpenCV
+- pandas
+- scikit-learn
 
-y1 = [0.1, 0.5, 0.8, 0.7, 0.9]
-y2 = [0.2, 0.4, 0.6, 0.9, 1.0]
-y3 = [0.3, 0.6, 0.4, 0.5, 0.8]
+## Quick start
 
-plot_multi_line_graph(
-    [y1, y2, y3], 
-    graph_title='Multiple Line Graph Example', 
-    line_labels=['Real Data 1', 'Real Data 2', 'Real Data 3']
-)
-```
-
-![Multi-Line Graph](https://imgur.com/vqJPpjY.png)
-
-### 3) Preprocessing: ``flashkeras.preprocessing``
-#### FlashPreProcessing
-- One-Hot-Encode
-- Converting and reshaping
-- Resizing
-
-```py
->>> from flashkeras.preprocessing import FlashPreProcessing as prep
-
->>> classes = ['dog', 'dog', 'fish', 'dog' 'cat']
-
->>> classes_encoded, encoder = prep.labelEncoder(classes, True)
->>> classes_encoded
-[0 0 2 1]
-
->>> class_decoded = prep.labelDecoder([2], encoder)
->>> class_decoded
-['fish']
-```
-
-#### ``images.FlashDataGenerator``
-- Collect images from directory (directory batches)
-- Collect images from array (np.ndarray batches)
-- Applying Filters
-- Resizing and reshaping
-
-### 4) Model Building: ``flashkeras.models``
-#### FlashSequential
-- Easier to use Sequential model.
-
-Example:  
-```py
-flash = FlashSequential('classification')
-flash.addDense(32, "relu")
-flash.fit(x_train, y_train, epochs=15, validation=(x_test, y_test), auto_output_layer=True)
-```
-*What's new???* there is no need to (besides possible...):
-- Give the input_shape
-- Create the output layer
-- Set the Optimizer
-- And many more
-
-**TIP:** Also, at any point (before fit of course), if you want to use one of the many other most specific keras functions you can always use FlashSequential.model as a normal keras.Sequential model!
-
-#### ``transferlearning.FlashTransferLearning``
-- How many layers you want from a network
-- How many frozen layers you want
-- Do all of that on your own saved network
-
-##### Example
 ```python
-# example of input_shape from flashkeras
-from flashkeras.preprocessing import FlashPreProcessing as flashprep
-input_shape = flashprep.getInputShape(train_batches)
+from flashkeras import FlashSequential, FlashPreProcessing, FlashDataGenerator
 
-# transfer learning from MobileNet
-from flashkeras.models import FlashTransferLearning
-flash_transfer = FlashTransferLearning(
-    input_shape=input_shape,
-    include_top=False, # excluding the Dense architecture
-    freeze=2, # freezing the first 2 layers
-    use_only_n_layers=7 # using only the first 7 layers
+# Example dataset
+# (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+
+# Preprocessing
+x_train = x_train.astype("float32") / 255.0
+x_test = x_test.astype("float32") / 255.0
+
+# Image augmentation / pipeline utilities
+img_gen = FlashDataGenerator(
+    img_shape=(28, 28),
+    rotation_range=10,
 )
-mobile_net = flash_transfer.transferMobileNet()
 
-# add mobilenet to the flash sequential
-flash.addTransferLearning(mobile_net)
-```
-### 5) Evaluation: flashkeras.evaluation
-#### FlashEvaluation
-- Accuracy, Recall, Precision, F1-Score
-- MSE, MEA
+train_batches = img_gen.flow_images_from_nparray(x_train, y_train)
+test_batches = img_gen.flow_images_from_nparray(x_test, y_test)
 
-```py
-from flashkeras.evaluation import FlashEvaluating as eval
-recall = eval.getRecall(flash, test_batches)
+# Model creation
+model = FlashSequential("classification")
+model.addDense(128, "relu")
+model.addDense(64, "relu")
+model.fit(
+    x=train_batches,
+    epochs=10,
+    validation_data=test_batches,
+    auto_output_layer=True
+)
+
+# Evaluation
+from flashkeras.evaluation import getAccuracy, getRecall
+
+acc = getAccuracy(model, x_test, y_test)
+recall = getRecall(model, x_test, y_test)
+print(acc, recall)
 ```
+
+## Core features
+
+### 1) Data collection
+Utilities to work with datasets and image sources in a simple way.
+
+```python
+from flashkeras.data_collecting import FlashDataGenerator
+
+# Example: loading batches from directory or array
+image_generator = FlashDataGenerator(img_shape=(32, 32))
+```
+
+### 2) Analysis and visualization
+Helpful functions for inspecting data and model behavior visually.
+
+```python
+from flashkeras.analysing import show_images_nparray
+
+show_images_nparray(x_train, num_images=5)
+```
+
+### 3) Preprocessing
+This is one of the strongest areas of the package. It includes utilities for:
+
+- train/test splitting
+- label encoding and decoding
+- resizing and reshaping
+- normalization
+- image format conversion
+- tabular feature preparation
+
+```python
+from flashkeras import FlashPreProcessing
+
+labels = ["cat", "dog", "cat", "fish"]
+encoded, encoder = FlashPreProcessing.labelEncoder(labels, True)
+print(encoded)
+print(FlashPreProcessing.labelDecoder([2], encoder))
+```
+
+### 4) Model building
+The library exposes simplified model abstractions for fast experimentation.
+
+```python
+from flashkeras import FlashSequential
+
+flash_model = FlashSequential("classification")
+flash_model.addDense(32, "relu")
+flash_model.addDense(10, "softmax")
+```
+
+This wrapper keeps the workflow close to Keras, while reducing repetitive setup work for common tasks.
+
+### 5) Transfer learning
+The library includes helpers for transfer learning patterns, enabling reuse of pretrained networks with a simpler API.
+
+```python
+from flashkeras.models import FlashTransferLearning
+
+transfer = FlashTransferLearning(
+    input_shape=(224, 224, 3),
+    include_top=False,
+    freeze=2,
+    use_only_n_layers=7
+)
+```
+
+### 6) Evaluation
+The evaluation module provides metrics for model quality analysis.
+
+```python
+from flashkeras.evaluation import getAccuracy, getPrecision, getRecall
+
+accuracy = getAccuracy(model, x_test, y_test)
+precision = getPrecision(model, x_test, y_test)
+recall = getRecall(model, x_test, y_test)
+```
+
+## Pipeline-based architecture
+
+FlashKeras is intentionally organized around the standard ML development lifecycle:
+
+1. Data collection
+2. Analysis
+3. Preprocessing
+4. Model creation
+5. Evaluation
+
+This modular structure makes it easier for users to:
+
+- understand each step of the pipeline
+- reuse only the modules they need
+- apply the library to experiments and prototypes quickly
+- keep code readable and educational
+
+## Example notebooks
+
+FlashKeras also includes notebook-based templates to help users start working quickly on recurring tasks without writing everything from scratch. These notebooks are designed as practical starting points for common workflows, especially in exploratory analysis and image classification.
+
+Examples included in the project:
+
+- exploratory data analysis for tabular data
+- image classification baseline workflows
+- visual inspection of datasets and model outputs
+- experimentation templates for preprocessing + training loops
+
+This makes the library useful not only as a Python package, but also as a teaching and prototyping tool for structured ML work.
+
+### Notebook commands
+
+To see the available example notebooks:
+
+```bash
+flashkeras notebooks list
+```
+
+To download a notebook locally:
+
+```bash
+flashkeras notebooks download <notebook-name>
+```
+
+Example:
+
+```bash
+flashkeras notebooks list
+flashkeras notebooks download image_classification_baseline
+```
+
+This workflow is especially useful for users who want a ready-made structure to explore data, prepare examples, and run common machine learning tasks faster.
+
+## Project focus
+
+FlashKeras is not trying to replace Keras or become a full general-purpose framework. Its focus is to simplify the most common deep learning tasks and reduce boilerplate, especially for:
+
+- quick experiments
+- educational projects
+- image classification pipelines
+- preprocessing-heavy workflows
+- beginner-friendly Keras usage
+
+## Contributing
+
+Contributions are welcome. If you want to improve the library, add utilities, or improve documentation, feel free to open a pull request.
+
+## License
+
+This project is distributed under the MIT license.
+
+## Project status
+
+FlashKeras is intended as a practical, compact toolkit for rapid prototyping and educational ML workflows. It prioritizes simplicity, modular organization, and ease of use without losing compatibility with the underlying Keras ecosystem.
+
