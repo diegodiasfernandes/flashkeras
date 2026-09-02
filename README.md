@@ -74,7 +74,7 @@ test_batches = img_gen.preprocess_images_from_nparray(x_test, y_test)
 model = FlashSequential("classification")
 model.addDense(128, "relu")
 model.addDense(64, "relu")
-model.fit(
+model.train(
     x=train_batches,
     epochs=10,
     validation_data=test_batches,

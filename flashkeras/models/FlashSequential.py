@@ -29,6 +29,37 @@ class FlashSequential:
         
         self.layers = self.model.layers
 
+    def addDense(
+        self, 
+        num_neurons: int, 
+        activation: Literal[
+            "relu",
+            "sigmoid",
+            "tanh",
+            "softmax",
+            "linear",
+            "elu",
+            "selu",
+            "gelu",
+            "swish",
+        ] = 'relu'
+    ) -> None:       
+        self._checkBlocked()
+
+        self.model.add(Dense(
+            num_neurons,
+            activation=activation
+        ))
+        
+        self.layers = self.model.layers
+
+    def addFlatten(self) -> None:       
+        self._checkBlocked()
+
+        self.model.add(Flatten())
+        
+        self.layers = self.model.layers
+
     def addTransferLearning(self, transferLayer: FlashNet) -> None: 
         '''
             Adds transfer learning layers created with FlashTransferLearning
@@ -87,7 +118,7 @@ class FlashSequential:
             elif self.task == 'regression':
                 self.model.add(Dense(self.output_neurons))
 
-    def fit(self, 
+    def train(self, 
             x: Any | None = None,
             y: Any | None = None,
             epochs: int = 1,
