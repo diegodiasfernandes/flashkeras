@@ -14,30 +14,59 @@ def preprocess_images_from_nparray(
     x: np.ndarray,
     y: np.ndarray | None = None,
     batch_size: int = 32,
-    img_shape: tuple[int, int] = (224, 224),
-    color_mode: Literal["rgb", "grayscale"] = "rgb",
+    img_shape: tuple[int, int] | Literal["auto"] = "auto",
+    color_mode: Literal["rgb", "grayscale", "auto"] = "auto",
     horizontal_flip: bool = False,
     rotation_range: int = 0,
     zoom_range: float = 0,
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> NumpyArrayIterator:
-    """Generates batches of augmented image data from NumPy arrays."""
+    """Generates batches of augmented image data from NumPy arrays with automatic shape and color mode detection, and dynamic pixel rescaling.
+
+    Args:
+        x: NumPy array of input images.
+        y: NumPy array of labels (optional).
+        batch_size: Size of the batches.
+        img_shape: Target image shape as (height, width) or "auto" to extract dimensions from input `x`.
+        color_mode: Color mode of the images ("rgb", "grayscale", or "auto" to preserve native format).
+        horizontal_flip: Whether to randomly flip images horizontally.
+        rotation_range: Degree range for random rotations.
+        zoom_range: Range for random zoom.
+        brightness_range: Range for picking a brightness shift factor.
+        fill_mode: Points outside the boundaries are filled according to the given mode.
+
+    Returns ```img_batches```:
+        A NumpyArrayIterator yielding batches of augmented images.
+    """
+    if img_shape == "auto":
+        if x.ndim >= 3:
+            img_shape = (x.shape[1], x.shape[2])
+        else:
+            raise ValueError("Input array 'x' must have at least 3 dimensions to automatically extract shape.")
+
+    if color_mode == "rgb":
+            x = prepro.convertNumpyNdArrayToRGB(x)
+    elif color_mode == "grayscale":
+        if x.ndim == 3:
+            x = np.expand_dims(x, axis=-1)
+        x = prepro.convertNumpyNdArrayToGrayScale(x)
+    else:
+        if x.ndim == 3:
+            x = np.expand_dims(x, axis=-1)
+            
+    x = prepro.resizeNpArray(x, img_shape[0], img_shape[1])
+
+    rescale_val = 1.0 / 255 if np.max(x) > 1.0 else None
+
     data_gen = ImageDataGenerator(
-        rescale=1.0 / 255,
+        rescale=rescale_val,
         horizontal_flip=horizontal_flip,
         rotation_range=rotation_range,
         zoom_range=zoom_range,
         brightness_range=brightness_range,
         fill_mode=fill_mode,
     )
-
-    if color_mode == "rgb":
-        x = prepro.convertNumpyNdArrayToRGB(x)
-    if color_mode == "grayscale":
-        x = prepro.convertNumpyNdArrayToGrayScale(x)
-
-    x = prepro.resizeNpArray(x, img_shape[0], img_shape[1])
 
     batches = data_gen.flow(x, y, batch_size, shuffle=True)
     return batches
@@ -48,17 +77,55 @@ def preprocess_images_from_nparray_test_split(
     y: np.ndarray,
     test_split: float = 0.2,
     batch_size: int = 32,
-    img_shape: tuple[int, int] = (224, 224),
-    color_mode: Literal["rgb", "grayscale"] = "rgb",
+    img_shape: tuple[int, int] | Literal["auto"] = "auto",
+    color_mode: Literal["rgb", "grayscale", "auto"] = "auto",
     horizontal_flip: bool = False,
     rotation_range: int = 0,
     zoom_range: float = 0,
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> tuple[NumpyArrayIterator, NumpyArrayIterator]:
-    """Generates training and validation batches from NumPy arrays using a validation split."""
+    """Generates training and validation batches from NumPy arrays using a validation split, with automatic shape and color mode detection, and dynamic pixel rescaling.
+
+    Args:
+        x: NumPy array of input images.
+        y: NumPy array of labels.
+        test_split: Fraction of images reserved for validation (validation_split).
+        batch_size: Size of the batches.
+        img_shape: Target image shape as (height, width) or "auto" to extract dimensions from input `x`.
+        color_mode: Color mode of the images ("rgb", "grayscale", or "auto" to preserve native format).
+        horizontal_flip: Whether to randomly flip images horizontally.
+        rotation_range: Degree range for random rotations.
+        zoom_range: Range for random zoom.
+        brightness_range: Range for picking a brightness shift factor.
+        fill_mode: Points outside the boundaries are filled according to the given mode.
+
+    Returns ```(train_batches, test_batches)```:
+        A tuple containing training and validation NumpyArrayIterators.
+    """
+    if img_shape == "auto":
+        if x.ndim >= 3:
+            img_shape = (x.shape[1], x.shape[2])
+        else:
+            raise ValueError("Input array 'x' must have at least 3 dimensions to automatically extract shape.")
+
+    if color_mode == "rgb":
+            x = prepro.convertNumpyNdArrayToRGB(x)
+    elif color_mode == "grayscale":
+        if x.ndim == 3:
+            x = np.expand_dims(x, axis=-1)
+        x = prepro.convertNumpyNdArrayToGrayScale(x)
+    else:
+        if x.ndim == 3:
+            x = np.expand_dims(x, axis=-1)
+
+    x = prepro.resizeNpArray(x, img_shape[0], img_shape[1])
+    y = prepro.ensureOneHotEncoding(y)
+
+    rescale_val = 1.0 / 255 if np.max(x) > 1.0 else None
+
     data_gen = ImageDataGenerator(
-        rescale=1.0 / 255,
+        rescale=rescale_val,
         validation_split=test_split,
         horizontal_flip=horizontal_flip,
         rotation_range=rotation_range,
@@ -66,14 +133,6 @@ def preprocess_images_from_nparray_test_split(
         brightness_range=brightness_range,
         fill_mode=fill_mode,
     )
-
-    if color_mode == "rgb":
-        x = prepro.convertNumpyNdArrayToRGB(x)
-    if color_mode == "grayscale":
-        x = prepro.convertNumpyNdArrayToGrayScale(x)
-
-    x = prepro.resizeNpArray(x, img_shape[0], img_shape[1])
-    y = prepro.ensureOneHotEncoding(y)
 
     train_batches = data_gen.flow(x, y, batch_size, subset="training", shuffle=True)
     test_batches = data_gen.flow(x, y, batch_size, subset="validation", shuffle=True)
