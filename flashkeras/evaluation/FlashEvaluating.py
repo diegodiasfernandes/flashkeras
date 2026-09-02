@@ -4,15 +4,15 @@ from flashkeras.utils.typehints import *
 from flashkeras.models import FlashSequential 
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score, mean_squared_error, root_mean_squared_error, mean_absolute_error, f1_score, roc_curve # type: ignore
 
-def _adjustClassMetrics(model: FlashSequential | Sequential, 
-                        x_test: pd.DataFrame | np.ndarray | BatchIterator, 
+def _adjustClassMetrics(model, 
+                        x_test: pd.DataFrame | np.ndarray | Any, 
                         y_test: pd.Series | np.ndarray | None = None
                         ) -> tuple[pd.Series | np.ndarray | Any, Any]:
 
-    if not isinstance(model, Sequential):
-        true_model = model.model
-    else:
+    if not hasattr(model, 'model') or type(model).__name__ == 'Sequential': # ajuste seguro conforme sua lógica original
         true_model = model
+    else:
+        true_model = model.model
 
     if isinstance(x_test, DirectoryIterator):
         y_true = x_test.classes
@@ -24,8 +24,12 @@ def _adjustClassMetrics(model: FlashSequential | Sequential,
         return y_true, y_pred_classes
 
     if isinstance(x_test, NumpyArrayIterator):
-        x_list = [x for x, _ in x_test]
-        y_list = [y for _, y in x_test]
+        x_list, y_list = [], []
+        for i in range(len(x_test)):
+            batch_x, batch_y = x_test[i]
+            x_list.append(batch_x)
+            y_list.append(batch_y)
+
         x_test = np.concatenate(x_list, axis=0)
         y_test = np.concatenate(y_list, axis=0)
 
@@ -42,7 +46,7 @@ def _adjustClassMetrics(model: FlashSequential | Sequential,
             raise ValueError("``y_test`` became None at ``np.argmax(y_test, axis=-1)``.")
 
         return y_test, y_pred_classes
-
+    
     if y_test is None:
         raise ValueError('``y_test`` must be provided if Test Data is not a ``BatchIterator``')
 
@@ -64,13 +68,23 @@ def _adjustClassMetrics(model: FlashSequential | Sequential,
     return y_test, y_pred_classes
 
 @overload
-def getAccuracy(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray | None) -> float: ...
+def getAccuracy(
+    model: FlashSequential | Sequential,
+    x_test: pd.DataFrame | np.ndarray,
+    y_test: pd.Series | np.ndarray | None
+) -> float: ...
+
 @overload
-def getAccuracy(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
-def getAccuracy(model: FlashSequential | Sequential, 
-                x_test: pd.DataFrame | np.ndarray | BatchIterator, 
-                y_test: pd.Series | np.ndarray | None = None
-                ) -> float:
+def getAccuracy(
+    model: FlashSequential | Sequential,
+    test_batches: BatchIterator
+) -> float: ...
+
+def getAccuracy(
+    model: FlashSequential | Sequential,
+    x_test: pd.DataFrame | np.ndarray | BatchIterator,
+    y_test: pd.Series | np.ndarray | None = None
+) -> float:
     
     y_test, y_pred_classes = _adjustClassMetrics(model, x_test, y_test)
     
