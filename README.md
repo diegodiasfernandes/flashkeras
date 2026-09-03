@@ -300,28 +300,66 @@ Examples included in the project:
 
 This makes the library useful not only as a Python package, but also as a teaching and prototyping tool for structured ML work.
 
-### Notebook commands
+### Generate notebooks from the command line
 
-To see the available example notebooks:
+FlashKeras can generate ready-to-edit Jupyter notebooks directly from the Windows
+Command Prompt. This is useful for users who are unsure where to start: the
+catalog and descriptions help identify the right workflow. It also saves
+experienced users from repeatedly creating boilerplate for common experiments.
 
-```bash
+Open **cmd**, activate the environment where FlashKeras is installed, and list
+the available templates:
+
+```cmd
 flashkeras notebooks list
 ```
 
-To download a notebook locally:
+Filter the catalog by a topic when you already know the kind of task you need:
 
-```bash
-flashkeras notebooks download <notebook-name>
+```cmd
+flashkeras notebooks list --tag tabular
+flashkeras notebooks list --tag cv
+flashkeras notebooks list --tag evaluation
 ```
 
-Example:
+Inspect a template before generating it. The command shows its purpose,
+parameters, and output filename:
 
-```bash
-flashkeras notebooks list
-flashkeras notebooks download image_classification_baseline
+```cmd
+flashkeras notebooks describe image_classification_baseline
 ```
 
-This workflow is especially useful for users who want a ready-made structure to explore data, prepare examples, and run common machine learning tasks faster.
+Create a notebook in the current directory with `notebooks new`:
+
+```cmd
+flashkeras notebooks new image_classification_baseline
+```
+
+Choose a destination directory or filename when organizing several experiments:
+
+```cmd
+flashkeras notebooks new eda_dataframe --dest notebooks
+flashkeras notebooks new text_classification_baseline --dest experiments\text_baseline.ipynb
+```
+
+The available template names currently include:
+
+- `eda_dataframe` for exploratory analysis of tabular data
+- `dataframe_classification_validation` for validating a DataFrame classifier
+- `image_classification_baseline` for a starter CNN image-classification workflow
+- `image_classification_validation` for evaluating an image classifier
+- `text_classification_baseline` for a starter text-classification workflow
+
+If the destination file already exists, FlashKeras keeps it unchanged unless
+you explicitly allow replacement:
+
+```cmd
+flashkeras notebooks new image_classification_baseline --dest experiments\baseline.ipynb --overwrite
+```
+
+After generation, open the `.ipynb` file in Jupyter or VS Code and replace the
+template paths and parameters with your own data. The generated notebook is a
+starting point, so it can be adapted without changing the original template.
 
 ## Project focus
 
