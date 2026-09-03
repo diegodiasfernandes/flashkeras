@@ -142,6 +142,109 @@ flash_model.addDense(10, "softmax")
 
 This wrapper keeps the workflow close to Keras, while reducing repetitive setup work for common tasks.
 
+## How to Use FlashSequential
+
+`FlashSequential` is a wrapper around `keras.Sequential` for building models in a linear order: each layer receives the output of the previous layer. It keeps Keras flexibility while providing short methods for common operations, such as adding dense layers, converting images into vectors, training, and making predictions.
+
+### Dense and Fully Connected Layers
+
+In Keras, `Dense` is the implementation of a **fully connected layer**. Each unit in the layer receives input from every unit in the previous layer and computes a weighted combination, usually followed by an activation function.
+
+The concepts below describe the same idea at different levels:
+
+| Concept | Meaning | How it appears in FlashKeras |
+| --- | --- | --- |
+| Fully connected layer | An architectural concept in which each unit connects to every input. | Describes the role of the layer. |
+| `Dense` | Keras implementation of this concept. | `model.addDense(64, "relu")` or `model.add(Dense(64, activation="relu"))` |
+| Unit/neuron | A unit that produces one value inside a `Dense` layer. | The first `addDense` argument, such as `64`, defines the number of units. |
+| Activation | A function applied to the layer output, such as `relu`, `sigmoid`, or `softmax`. | The second `addDense` argument defines the activation. |
+| Output layer | The final layer responsible for producing predictions. | It can be added automatically with `auto_output_layer=True`. |
+
+### Why Use Flatten with Images?
+
+An image usually reaches the model as a tensor with the shape `(height, width, channels)`, for example `(28, 28, 1)` for a grayscale image. An architecture based only on `Dense` layers is easier to reason about when each example is represented as a vector.
+
+`Flatten` rearranges the values without learning parameters: `(28, 28, 1)` becomes `(784,)`. It does not resize the image, normalize its pixels, or reduce the amount of information; it only removes the spatial structure so a fully connected layer can receive all pixels as inputs.
+
+```python
+from flashkeras import FlashSequential
+
+model = FlashSequential("classification")
+model.addFlatten()            # (28, 28, 1) -> (784,)
+model.addDense(128, "relu")   # hidden layer
+
+# The output layer is inferred from y_train.
+model.train(
+    x=x_train,
+    y=y_train,
+    epochs=10,
+    validation_data=(x_test, y_test),
+    auto_output_layer=True,
+)
+```
+
+Use `addFlatten()` when the next part of the model is a `Dense` layer and the data still has spatial dimensions. In a convolutional model, it usually appears after `Conv2D` and pooling layers, before the dense layers:
+
+```python
+from flashkeras import FlashSequential
+from tensorflow.keras.layers import MaxPooling2D
+
+model = FlashSequential("classification")
+model.addConvolution2D(32, (3, 3), activation="relu")
+model.add(MaxPooling2D())
+model.addFlatten()
+model.addDense(64, "relu")
+model.train(x=x_train, y=y_train, epochs=5, auto_output_layer=True)
+```
+
+`Flatten` is not required for every model. Convolutional networks can use `GlobalAveragePooling2D`, and architectures that already produce vectors can go directly to `Dense`. You should also not use `Flatten` before `Conv2D`, because convolution needs the image height and width to remain structured.
+
+### Complete Workflow
+
+The recommended workflow is to build the architecture, inspect the summary, and train. `train()` automatically configures the input shape, compiles the model when necessary, and can create the task-appropriate output layer.
+
+```python
+from flashkeras import FlashSequential
+
+model = FlashSequential("classification")
+model.addFlatten()
+model.addDense(128, "relu")
+model.addDense(64, "relu")
+
+model.summary()
+history = model.train(
+    x=x_train,
+    y=y_train,
+    epochs=10,
+    validation_data=(x_test, y_test),
+    auto_output_layer=True,
+)
+
+predictions = model.predict(x_test)
+one_prediction = model.singlePredict(x_test[0])
+```
+
+For manual control over the configuration, use `build()` and `compile()` before calling Keras directly or starting training:
+
+```python
+model = FlashSequential("regression")
+model.addDense(64, "relu")
+model.build(x_train, y_train, auto_output_layer=True)
+model.compile(optimizer="adam", loss="mse", metrics=["mae"])
+history = model.model.fit(x_train, y_train, epochs=10)
+```
+
+| Situation | Recommended structure | Notes |
+| --- | --- | --- |
+| Tabular data | `Dense -> Dense -> output` | Each sample is already a feature vector. |
+| Image with `Dense` only | `Flatten -> Dense -> output` | Converts the image tensor into a vector. |
+| Image with convolution | `Conv2D -> Pooling -> Flatten -> Dense -> output` | Preserves spatial structure during feature extraction. |
+| Binary classification | Hidden layers + automatic output | FlashKeras infers a one-unit `sigmoid` output. |
+| Multiclass classification | Hidden layers + automatic output | FlashKeras infers `softmax` and the number of classes from the labels. |
+| Regression | Hidden layers + automatic output | FlashKeras uses a linear output and `mse` as the default loss. |
+
+The `addDense()` and `addFlatten()` methods are shortcuts. For any Keras-compatible layer, use `model.add(layer)`. After a complete model is loaded with `loadModel()`, architecture changes are blocked to preserve the restored model.
+
 ### 5) Transfer learning
 The library includes helpers for transfer learning patterns, enabling reuse of pretrained networks with a simpler API.
 
