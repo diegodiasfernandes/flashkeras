@@ -2,7 +2,7 @@ from setuptools import setup, find_packages # type: ignore
 
 setup(
     name="flashkeras",
-    version="1.1.0",
+    version="1.1.1",
     packages=find_packages(include=['flashkeras', 'flashkeras.*']),
     install_requires=[ 
         'tensorflow==2.15.0',
