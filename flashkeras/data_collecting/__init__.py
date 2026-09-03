@@ -15,6 +15,7 @@ from .datasets import (
     reuters_get_word_index,
     reuters_get_label_names,
 )
+from pandas import read_csv, read_parquet
 from .images import (
     load_all_classes_from_directory_and_preprocess,
     load_all_classes_from_directory_and_preprocess_test_split,
@@ -39,6 +40,8 @@ __all__ = [
     'load_reuters',
     'reuters_get_word_index',
     'reuters_get_label_names',
+    'read_csv',
+    'read_parquet',
     'load_from_directory_and_preprocess',
     'load_all_classes_from_directory_and_preprocess',
     'load_all_classes_from_directory_and_preprocess_test_split',
