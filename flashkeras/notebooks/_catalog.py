@@ -74,6 +74,25 @@ NOTEBOOKS = {
             "separator": "CSV delimiter (default ',').",
         },
     },
+    "dataframe_regression_baseline": {
+        "title": "DataFrame Regression Baseline",
+        "description": (
+            "Keras regression baseline for numeric data loaded from a CSV: scales "
+            "features and target values, trains a FlashSequential model, and "
+            "plots training curves."
+        ),
+        "filename": "dataframe_regression_baseline.ipynb",
+        "tags": ["keras", "regression", "tabular", "baseline"],
+        "parameters": {
+            "data_csv": "Path to your CSV file.",
+            "target_column": "Name of the numeric target column.",
+            "separator": "CSV delimiter (default ',').",
+            "test_size": "Fraction of data held out for testing.",
+            "epochs": "Number of training epochs.",
+            "batch_size": "Training batch size.",
+            "seed": "Random seed for the train/test split.",
+        },
+    },
     "text_classification_baseline": {
         "title": "Text Classification Baseline",
         "description": (
