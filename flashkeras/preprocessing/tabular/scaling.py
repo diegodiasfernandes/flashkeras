@@ -4,7 +4,7 @@ from flashkeras.utils.typehints import *
 
 
 
-def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1, return_scaler: bool = False) -> np.ndarray | tuple[MinMaxScaler, np.ndarray]:
+def minMaxScaler(x: pd.DataFrame | pd.Series | np.ndarray, min: float = 0, max: float = 1, return_scaler: bool = False) -> np.ndarray | tuple[MinMaxScaler, np.ndarray]:
 
     """
     Scale numerical features to a specified range using Min-Max normalization.
@@ -12,7 +12,7 @@ def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1, r
     `Flash Explanation:` *`Use this when you want to transform your data to a specific range (like [0, 1]) so that all features are comparable!`*
 
     Parameters
-        x : pd.DataFrame | np.ndarray
+        x : pd.DataFrame | pd.Series | np.ndarray
             Input data to be scaled.
         min : float, default=0
             Desired minimum value of the transformed data.
@@ -27,13 +27,23 @@ def minMaxScaler(x: pd.DataFrame | np.ndarray, min: float = 0, max: float = 1, r
             If `return_scaler=True`, returns a tuple containing `(scaler, scaled_data)`.
     """
     
+    is_one_dimensional = isinstance(x, pd.Series) or (
+        isinstance(x, np.ndarray) and x.ndim == 1
+    )
+    values = x.to_numpy().reshape(-1, 1) if isinstance(x, pd.Series) else x
+    if is_one_dimensional:
+        values = np.asarray(values).reshape(-1, 1)
+
     scaler = MinMaxScaler((min, max))
-    scaler.fit(x)
+    scaler.fit(values)
+    scaled_values = scaler.transform(values)
+    if is_one_dimensional:
+        scaled_values = scaled_values.ravel()
 
     if return_scaler:
-        return scaler, scaler.transform(x)
+        return scaler, scaled_values
     else:
-        return scaler.transform(x)
+        return scaled_values
 
 def minMaxScaleRevert(x: np.ndarray, scaler: MinMaxScaler) -> np.ndarray:
     
