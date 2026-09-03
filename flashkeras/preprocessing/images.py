@@ -24,6 +24,8 @@ def preprocess_images_from_nparray(
 ) -> NumpyArrayIterator:
     """Generates batches of augmented image data from NumPy arrays with automatic shape and color mode detection, and dynamic pixel rescaling.
 
+    `Flash Explanation:` *`Use this to resize, recolor, normalize, and augment images in a Keras iterator.`*
+
     Args:
         x: NumPy array of input images.
         y: NumPy array of labels (optional).
@@ -86,6 +88,8 @@ def preprocess_images_from_nparray_test_split(
     fill_mode: str = "nearest",
 ) -> tuple[NumpyArrayIterator, NumpyArrayIterator]:
     """Generates training and validation batches from NumPy arrays using a validation split, with automatic shape and color mode detection, and dynamic pixel rescaling.
+
+    `Flash Explanation:` *`Use this to prepare augmented training and validation iterators from arrays.`*
 
     Args:
         x: NumPy array of input images.
@@ -328,6 +332,8 @@ def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, Numpy
 
 def getImageShape(image: Union[np.ndarray, Image.Image, str]) -> Tuple[int, int]:
     '''Provide the image or path to the image and get its dimensions size i.e. (32, 32).
+
+    `Flash Explanation:` *`Use this to obtain image dimensions from common image representations.`*
     '''
 
     if isinstance(image, str):

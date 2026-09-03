@@ -5,6 +5,10 @@ from flashkeras.notebooks import describe, list_notebooks, new_notebook
 
 
 def _cmd_notebooks_list(args: argparse.Namespace) -> None:
+    """Print the available notebook templates, optionally filtered by tag.
+
+    `Flash Explanation:` *`Use this internal command handler to display the notebook catalog.`*
+    """
     items = list_notebooks(tag=args.tag)
 
     if not items:
@@ -27,11 +31,19 @@ def _cmd_notebooks_list(args: argparse.Namespace) -> None:
 
 
 def _as_named(items):
+    """Yield notebook metadata as ``(name, metadata)`` pairs.
+
+    `Flash Explanation:` *`Normalize catalog entries for CLI display.`*
+    """
     for meta in items:
         yield meta.get("name", meta["title"]), meta
 
 
 def _cmd_notebooks_describe(args: argparse.Namespace) -> None:
+    """Print details for one named notebook template.
+
+    `Flash Explanation:` *`Use this internal command handler to inspect a template from the CLI.`*
+    """
     try:
         meta = describe(args.name)
     except ValueError as e:
@@ -46,6 +58,10 @@ def _cmd_notebooks_describe(args: argparse.Namespace) -> None:
 
 
 def _cmd_notebooks_new(args: argparse.Namespace) -> None:
+    """Create a notebook template at the requested destination.
+
+    `Flash Explanation:` *`Use this internal command handler to generate a starter notebook.`*
+    """
     try:
         path = new_notebook(
             args.name,
@@ -60,6 +76,10 @@ def _cmd_notebooks_new(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build and configure the flashkeras command-line argument parser.
+
+    `Flash Explanation:` *`Use this to obtain the parser that defines notebook commands.`*
+    """
     parser = argparse.ArgumentParser(
         prog="flashkeras",
         description="flashkeras CLI - helpers for fast Keras / ML pipelines.",
@@ -121,6 +141,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
+    """Parse command-line arguments and dispatch the selected command.
+
+    `Flash Explanation:` *`Use this as the executable entry point for the flashkeras CLI.`*
+    """
     parser = build_parser()
     args = parser.parse_args()
 

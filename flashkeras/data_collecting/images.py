@@ -9,7 +9,10 @@ from flashkeras.utils.typehints import DirectoryIterator
 
 
 def _get_class_mode(path_or_class_list: str | list[str]) -> str:
-    """Infers the Keras class mode from a directory path or a class list."""
+    """Infers the Keras class mode from a directory path or a class list.
+
+    `Flash Explanation:` *`Use this internal helper to select the label encoding expected by Keras.`*
+    """
     num_classes: int = 0
     if isinstance(path_or_class_list, str):
         num_classes = count_directories_in_directory(path_or_class_list)
@@ -34,7 +37,10 @@ def load_from_directory_and_preprocess(
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> DirectoryIterator:
-    """Loads batches of images directly from a directory without keeping them in memory."""
+    """Loads batches of images directly from a directory without keeping them in memory.
+
+    `Flash Explanation:` *`Use this for memory-efficient unlabeled image inference.`*
+    """
     data_gen = ImageDataGenerator(
         rescale=1.0 / 255,
         horizontal_flip=horizontal_flip,
@@ -65,7 +71,10 @@ def load_all_classes_from_directory_and_preprocess(
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> DirectoryIterator | None:
-    """Loads all classes from a directory tree as labeled image batches."""
+    """Loads all classes from a directory tree as labeled image batches.
+
+    `Flash Explanation:` *`Use this to build a shuffled labeled iterator from class folders.`*
+    """
     class_mode = _get_class_mode(path_to_main_dir)
 
     data_gen = ImageDataGenerator(
@@ -99,7 +108,10 @@ def load_all_classes_from_directory_and_preprocess_test_split(
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> tuple[DirectoryIterator, DirectoryIterator] | None:
-    """Loads all classes from a directory tree and splits train/validation automatically."""
+    """Loads all classes from a directory tree and splits train/validation automatically.
+
+    `Flash Explanation:` *`Use this to create matching training and validation iterators.`*
+    """
     class_mode = _get_class_mode(path_to_main_dir)
 
     data_gen = ImageDataGenerator(
@@ -147,7 +159,10 @@ def load_classes_from_directory_and_preprocess(
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> DirectoryIterator | None:
-    """Loads only selected classes from a directory tree as image batches."""
+    """Loads only selected classes from a directory tree as image batches.
+
+    `Flash Explanation:` *`Use this to restrict training data to a chosen class subset.`*
+    """
     class_mode = _get_class_mode(classes)
 
     data_gen = ImageDataGenerator(
@@ -183,7 +198,10 @@ def load_classes_from_directory_and_preprocess_test_split(
     brightness_range: tuple[float, float] | None = None,
     fill_mode: str = "nearest",
 ) -> tuple[DirectoryIterator, DirectoryIterator] | None:
-    """Loads selected classes and splits them into training and validation batches."""
+    """Loads selected classes and splits them into training and validation batches.
+
+    `Flash Explanation:` *`Use this to create train/validation iterators for selected classes.`*
+    """
     class_mode: str = _get_class_mode(classes)
 
     data_gen = ImageDataGenerator(

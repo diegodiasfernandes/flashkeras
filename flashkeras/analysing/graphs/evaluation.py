@@ -1,6 +1,10 @@
 from flashkeras.utils.otherimports import *
 
 def plot_history_train_curve(history):
+    """Plot training and validation loss and accuracy from a Keras history.
+
+    `Flash Explanation:` *`Use this to assess learning progress and detect overfitting visually.`*
+    """
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
 
     axes[0].plot(history.history["accuracy"], label="train")

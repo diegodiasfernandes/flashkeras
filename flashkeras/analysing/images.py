@@ -3,6 +3,10 @@ from flashkeras.utils.typehints import *
 from flashkeras.utils.typehints import BatchIterator
 
 def show_images_from_batch(batches: BatchIterator, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
+    """Display one or more images sampled from a batch iterator.
+
+    `Flash Explanation:` *`Use this to visually inspect images produced by a data pipeline.`*
+    """
     all_images = []
     images, labels = (None, None)
     while True:
@@ -28,6 +32,10 @@ def show_images_from_batch(batches: BatchIterator, num_images: int = 1, fig_size
     plt.show()
 
 def show_images_nparray(images: np.ndarray, num_images: int = 1, fig_size: tuple[int, int] = (15,5)):
+    """Display several images from a NumPy image batch.
+
+    `Flash Explanation:` *`Use this for a quick visual check of an image array.`*
+    """
     num_images = min(num_images, len(images))
 
     plt.figure(figsize=fig_size)
@@ -40,6 +48,10 @@ def show_images_nparray(images: np.ndarray, num_images: int = 1, fig_size: tuple
     plt.show()
 
 def show_image_nparray(image: np.ndarray, fig_size: tuple[int, int] = (7,7)):
+    """Display a single image stored as a NumPy array.
+
+    `Flash Explanation:` *`Use this to inspect one array-backed image.`*
+    """
     plt.figure(figsize=fig_size)
     
     plt.imshow(image)
@@ -48,6 +60,10 @@ def show_image_nparray(image: np.ndarray, fig_size: tuple[int, int] = (7,7)):
     plt.show()
 
 def show_images_from_directory(dir_path: str, num_images=1):
+    """Display images selected from a directory.
+
+    `Flash Explanation:` *`Use this to preview image files before loading them into a dataset.`*
+    """
 
     files = os.listdir(dir_path)
     
@@ -68,6 +84,10 @@ def show_images_from_directory(dir_path: str, num_images=1):
     plt.show()
 
 def show_image(image: Union[np.ndarray, Image.Image, str], fig_size: tuple[int, int] = (7,7)) -> Tuple[int, int]:
+    """Display an image supplied as an array, PIL image, or file path.
+
+    `Flash Explanation:` *`Use this for a format-agnostic single-image preview.`*
+    """
     '''Provide the image or path to the image and shows it.
     '''
 

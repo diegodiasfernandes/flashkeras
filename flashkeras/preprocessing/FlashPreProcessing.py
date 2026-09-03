@@ -240,6 +240,10 @@ class FlashPreProcessing:
 
         
         def to_2d_array(data):
+            """Convert a supported tabular value to a two-dimensional array.
+
+            `Flash Explanation:` *`Use this internal helper to normalize shapes before stacking rows.`*
+            """
             if isinstance(data, pd.DataFrame):
                 return data.values
             elif isinstance(data, pd.Series):
@@ -274,11 +278,11 @@ class FlashPreProcessing:
 
     @overload
     @staticmethod
-    def stackImageDatasets(data_a: np.ndarray, data_b: np.ndarray) -> np.ndarray: ...
+    def stackImageDatasets(data_a: np.ndarray, data_b: np.ndarray) -> np.ndarray: """Array overload. `Flash Explanation:` *`Use this signature for two image arrays.`*"""
     
     @overload
     @staticmethod
-    def stackImageDatasets(data_a: Tuple[np.ndarray, np.ndarray], data_b: Tuple[np.ndarray, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]: ...
+    def stackImageDatasets(data_a: Tuple[np.ndarray, np.ndarray], data_b: Tuple[np.ndarray, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]: """Tuple overload. `Flash Explanation:` *`Use this signature for image and label pairs.`*"""
     
     @staticmethod
     def stackImageDatasets(
@@ -469,6 +473,8 @@ class FlashPreProcessing:
     @staticmethod
     def getImageShape(image: Union[np.ndarray, Image.Image, str]) -> Tuple[int, int]:
         '''Provide the image or path to the image and get its dimensions size i.e. (32, 32).
+
+        `Flash Explanation:` *`Use this to obtain height and width before image preprocessing.`*
         '''
 
         if isinstance(image, str):

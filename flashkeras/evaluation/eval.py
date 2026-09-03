@@ -8,6 +8,10 @@ def _adjustClassMetrics(model,
                         x_test: pd.DataFrame | np.ndarray | Any, 
                         y_test: pd.Series | np.ndarray | None = None
                         ) -> tuple[pd.Series | np.ndarray | Any, Any]:
+    """Convert supported test inputs into true and predicted class labels.
+
+    `Flash Explanation:` *`Use this internal helper to make classification metrics work with arrays and Keras iterators.`*
+    """
 
     if not hasattr(model, 'model') or type(model).__name__ == 'Sequential': # ajuste seguro conforme sua lógica original
         true_model = model
@@ -72,60 +76,106 @@ def getAccuracy(
     model: FlashSequential | Sequential,
     x_test: pd.DataFrame | np.ndarray,
     y_test: pd.Series | np.ndarray | None
-) -> float: ...
+) -> float: """Accuracy overload for array-like test data. `Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*"""
+"""Accuracy overload for array-like test data.
+
+`Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*
+"""
 
 @overload
 def getAccuracy(
     model: FlashSequential | Sequential,
     test_batches: BatchIterator
-) -> float: ...
+) -> float: """Accuracy overload for a batch iterator. `Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*"""
+"""Accuracy overload for a batch iterator.
+
+`Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*
+"""
 
 def getAccuracy(
     model: FlashSequential | Sequential,
     x_test: pd.DataFrame | np.ndarray | BatchIterator,
     y_test: pd.Series | np.ndarray | None = None
 ) -> float:
+    """Return classification accuracy for a model and test data.
+
+    `Flash Explanation:` *`Use this to measure the fraction of correctly predicted classes.`*
+    """
     
     y_test, y_pred_classes = _adjustClassMetrics(model, x_test, y_test)
     
     return accuracy_score(y_test, y_pred_classes)
 
 @overload
-def getPrecision(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: ...
+def getPrecision(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: """Precision overload for array-like test data. `Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*"""
+"""Precision overload for array-like test data.
+
+`Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*
+"""
 @overload
-def getPrecision(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
+def getPrecision(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: """Precision overload for a batch iterator. `Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*"""
+"""Precision overload for a batch iterator.
+
+`Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*
+"""
 def getPrecision(model: FlashSequential | Sequential, 
                 x_test: pd.DataFrame | np.ndarray | BatchIterator, 
                 y_test: pd.Series | np.ndarray | None = None
                 ) -> float:
+    """Return macro-averaged precision for a model and test data.
+
+    `Flash Explanation:` *`Use this to measure prediction correctness while weighting each class equally.`*
+    """
     
     y_test, y_pred_classes = _adjustClassMetrics(model, x_test, y_test)
     
     return precision_score(y_test, y_pred_classes, average='macro')
 
 @overload
-def getRecall(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: ...
+def getRecall(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: """Recall overload for array-like test data. `Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*"""
+"""Recall overload for array-like test data.
+
+`Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*
+"""
 @overload
-def getRecall(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
+def getRecall(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: """Recall overload for a batch iterator. `Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*"""
+"""Recall overload for a batch iterator.
+
+`Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*
+"""
 def getRecall(model: FlashSequential | Sequential, 
                 x_test: pd.DataFrame | np.ndarray | BatchIterator, 
                 y_test: pd.Series | np.ndarray | None = None
                 ) -> float:
+    """Return macro-averaged recall for a model and test data.
+
+    `Flash Explanation:` *`Use this to measure how many examples from each class are recovered.`*
+    """
     
     y_test, y_pred_classes = _adjustClassMetrics(model, x_test, y_test)
     
     return recall_score(y_test, y_pred_classes, average='macro')
 
 @overload
-def getROC_AUC(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: ...
+def getROC_AUC(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: """ROC AUC overload for array-like test data. `Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*"""
+"""ROC AUC overload for array-like test data.
+
+`Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*
+"""
 @overload
-def getROC_AUC(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
+def getROC_AUC(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: """ROC AUC overload for a batch iterator. `Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*"""
+"""ROC AUC overload for a batch iterator.
+
+`Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*
+"""
 def getROC_AUC(model: FlashSequential | Sequential, 
                 x_test: Union[pd.DataFrame, np.ndarray, BatchIterator], 
                 y_test: Union[pd.Series, np.ndarray, None] = None
                 ) -> float:
     """
     Calculate the ROC AUC score of the given model on the test data.
+
+    `Flash Explanation:` *`Use this to measure ranking quality across classification thresholds.`*
     
     Parameters:
     model (FlashSequential | Sequential): The model to evaluate.
@@ -141,15 +191,25 @@ def getROC_AUC(model: FlashSequential | Sequential,
     return roc_auc_score(y_test, y_pred_proba)
 
 @overload
-def getF1Score(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: ...
+def getF1Score(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray) -> float: """F1 overload for array-like test data. `Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*"""
+"""F1 overload for array-like test data.
+
+`Flash Explanation:` *`Use this signature when supplying explicit features and labels.`*
+"""
 @overload
-def getF1Score(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: ...
+def getF1Score(model: FlashSequential | Sequential, x_test: BatchIterator) -> float: """F1 overload for a batch iterator. `Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*"""
+"""F1 overload for a batch iterator.
+
+`Flash Explanation:` *`Use this signature when labels are stored in the iterator.`*
+"""
 def getF1Score(model: FlashSequential | Sequential, 
                 x_test: Union[pd.DataFrame, np.ndarray, BatchIterator], 
                 y_test: Union[pd.Series, np.ndarray, None] = None
                 ) -> float:
     """
     Calculate the F1 score of the given model on the test data.
+
+    `Flash Explanation:` *`Use this to summarize macro-averaged precision and recall.`*
     
     Parameters:
     model (FlashSequential | Sequential): The model to evaluate.
@@ -165,6 +225,10 @@ def getF1Score(model: FlashSequential | Sequential,
     return f1_score(y_test, y_pred_classes, average='macro')
 
 def getMSE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray):
+    """Return mean squared error for regression predictions.
+
+    `Flash Explanation:` *`Use this to quantify the average squared prediction error.`*
+    """
     if not isinstance(model, Sequential):
         true_model = model.model
     else:
@@ -174,6 +238,10 @@ def getMSE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarra
     return mean_squared_error(y_test, y_pred)
 
 def getRMSE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray):
+    """Return root mean squared error for regression predictions.
+
+    `Flash Explanation:` *`Use this to express prediction error in the target's units.`*
+    """
     if not isinstance(model, Sequential):
         true_model = model.model
     else:
@@ -183,11 +251,15 @@ def getRMSE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarr
     return root_mean_squared_error(y_test, y_pred)
 
 def getMAE(model: FlashSequential | Sequential, x_test: pd.DataFrame | np.ndarray, y_test: pd.Series | np.ndarray):
-        if not isinstance(model, Sequential):
-            true_model = model.model
-        else:
-            true_model = model
+    """Return mean absolute error for regression predictions.
 
-        y_pred = true_model.predict(x_test)
+    `Flash Explanation:` *`Use this to measure average absolute prediction error.`*
+    """
+    if not isinstance(model, Sequential):
+        true_model = model.model
+    else:
+        true_model = model
 
-        return mean_absolute_error(y_test, y_pred)
+    y_pred = true_model.predict(x_test)
+
+    return mean_absolute_error(y_test, y_pred)

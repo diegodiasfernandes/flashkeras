@@ -13,6 +13,10 @@ def plot_line_graph(y_values: list | np.ndarray,
                     y_ticks=None,
                     grid: bool = False
                     ):
+    """Plot a single line graph and display it.
+
+    `Flash Explanation:` *`Use this to visualize ordered y-values with optional axis customization.`*
+    """
 
     if x_values is None:
         x_values = np.arange(1, len(y_values) + 1)
@@ -50,6 +54,10 @@ def get_line_graph(y_values: list | np.ndarray,
                    x_ticks=None,
                    y_ticks=None,
                    grid: bool = False):
+    """Create and return a single line graph figure.
+
+    `Flash Explanation:` *`Use this when the caller needs to embed or further customize the figure.`*
+    """
     
     if x_values is None:
         x_values = np.arange(1, len(y_values) + 1)
@@ -89,6 +97,8 @@ def plot_multi_line_graph(coords: list[list[list]],
                           y_ticks=None,
                           grid: bool = False):
     """Plots multiple lines on the same graph with the given coordnates
+
+    `Flash Explanation:` *`Use this to compare several coordinate series in one displayed chart.`*
     
     :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
     :param labels: Names of the different lines.
@@ -141,6 +151,8 @@ def get_multi_line_graph(coords: list[list[list]],
                          y_ticks=None,
                          grid: bool = False):
     """Generate a multi-lines graph with the given coordnates and returns it
+
+    `Flash Explanation:` *`Use this to create a reusable comparison figure for several series.`*
     
     :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
     :param labels: Names of the different lines.
@@ -196,12 +208,18 @@ def plot_multi_line_graph_polynomial_fit(coords: list[list[list]],
                           regression_line_color='black'
                           ):
     """Plots multiple lines on the same graph with the given coordnates and also plots the polynomial regression of all the points.
+
+    `Flash Explanation:` *`Use this to display multiple series together with their best polynomial fit.`*
     
     :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
     :param labels: Names of the different lines.
     """
     
     def find_best_polynomial_degree(x, y, max_degree):
+        """Select the polynomial degree with the lowest mean squared error.
+
+        `Flash Explanation:` *`Use this helper to choose a fit complexity from the supplied data.`*
+        """
         best_degree = 1
         best_error = float('inf')
 
@@ -270,12 +288,18 @@ def get_multi_line_graph_polynomial_fit(coords: list[list[list]],
                           y_ticks=None,
                           grid: bool = False):
     """Generate a multi-lines graph with the given coordnates and a polynomial regression and returns it
+
+    `Flash Explanation:` *`Use this to return a comparison figure with a fitted polynomial regression.`*
     
     :param coords: List of coordnates lists i.e. [ [[x, y], [x, y]], [[x, y], [x, y], [x, y]] ].
     :param labels: Names of the different lines.
     """
     
     def find_best_polynomial_degree(x, y, max_degree):
+        """Select the polynomial degree with the lowest mean squared error.
+
+        `Flash Explanation:` *`Use this helper to choose a fit complexity from the supplied data.`*
+        """
         best_degree = 1
         best_error = float('inf')
 
@@ -345,8 +369,16 @@ def plot_line_graph_polynomial_fit_zoom_higher_y(y_values: list | np.ndarray,
                                                x_ticks=None,
                                                grid: bool = False
                                                ) -> None:
+    """Plot a polynomial fit while zooming the y-axis around high values.
+
+    `Flash Explanation:` *`Use this to emphasize the upper portion of a fitted single-series chart.`*
+    """
 
     def find_y_limits(y_values) -> tuple[float, float]:
+        """Calculate focused lower and upper y-axis bounds.
+
+        `Flash Explanation:` *`Use this helper to frame the plot around its largest values.`*
+        """
         highest_value = max(y_values)
         lower_limit = highest_value * focus_threshold
         lower_dif = highest_value
@@ -363,6 +395,10 @@ def plot_line_graph_polynomial_fit_zoom_higher_y(y_values: list | np.ndarray,
         return lower_value, highest_value
 
     def find_best_polynomial_degree(x, y, max_degree):
+        """Select the polynomial degree with the lowest mean squared error.
+
+        `Flash Explanation:` *`Use this helper to choose a fit complexity from the supplied data.`*
+        """
         best_degree = 1
         best_error = float('inf')
 
@@ -420,8 +456,16 @@ def get_line_graph_polynomial_fit_zoom_higher_y(y_values: list | np.ndarray,
                                                 fig_size=(15, 6),
                                                 x_ticks=None,
                                                 grid: bool = False) -> plt.Figure:
+    """Return a polynomial-fit figure with a y-axis focused on high values.
+
+    `Flash Explanation:` *`Use this when a returned, embeddable figure should emphasize the upper range.`*
+    """
     
     def find_y_limits(y_values) -> tuple[float, float]:
+        """Calculate focused lower and upper y-axis bounds.
+
+        `Flash Explanation:` *`Use this helper to frame the plot around its largest values.`*
+        """
         highest_value = max(y_values)
         lower_limit = highest_value * focus_threshold
         lower_dif = highest_value
@@ -438,6 +482,10 @@ def get_line_graph_polynomial_fit_zoom_higher_y(y_values: list | np.ndarray,
         return lower_value, highest_value
 
     def find_best_polynomial_degree(x, y, max_degree):
+        """Select the polynomial degree with the lowest mean squared error.
+
+        `Flash Explanation:` *`Use this helper to choose a fit complexity from the supplied data.`*
+        """
         best_degree = 1
         best_error = float('inf')
 
@@ -497,8 +545,16 @@ def plot_line_graph_polynomial_fit(y_values: list | np.ndarray,
                                    y_ticks=None,
                                    grid: bool = False
                                    ):
+    """Plot a single series and its best polynomial regression.
+
+    `Flash Explanation:` *`Use this to inspect trend data and its fitted curve in a displayed chart.`*
+    """
     
     def find_best_polynomial_degree(x, y, max_degree):
+        """Select the polynomial degree with the lowest mean squared error.
+
+        `Flash Explanation:` *`Use this helper to choose a fit complexity from the supplied data.`*
+        """
         best_degree = 1
         best_error = float('inf')
 
@@ -562,8 +618,16 @@ def get_line_graph_polynomial_fit(y_values: list | np.ndarray,
                                   x_ticks=None,
                                   y_ticks=None,
                                   grid: bool = False):
+    """Return a single-series figure with its best polynomial regression.
+
+    `Flash Explanation:` *`Use this when the fitted chart must be embedded or customized by the caller.`*
+    """
 
     def find_best_polynomial_degree(x, y, max_degree):
+        """Select the polynomial degree with the lowest mean squared error.
+
+        `Flash Explanation:` *`Use this helper to choose a fit complexity from the supplied data.`*
+        """
         best_degree = 1
         best_error = float('inf')
 

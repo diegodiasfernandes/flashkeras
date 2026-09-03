@@ -7,10 +7,32 @@ class FlashNet:
                     network: Union[Sequential, Functional],
                     isFullNetwork: bool
                     ) -> None:
+        """Wrap a transfer-learning network.
+
+        `Flash Explanation:` *`Use this to record whether architecture edits are allowed.`*
+        """
         self.network = network
         self.isFullNetwork: bool = isFullNetwork
 
 class FlashTransferLearning:
+    """Configure and create pretrained Keras networks for transfer learning.
+
+    `Flash Explanation:` *`Use this class to load pretrained backbones, freeze layers, optionally truncate networks, and prepare them for reuse in another model.`*
+
+    Parameters:
+        input_shape: Shape of the input images, including height, width, and channels.
+        include_top: Whether to include the pretrained classification head.
+        weights: Weight source passed to the Keras application model, such as ``"imagenet"``.
+        freeze: Whether to freeze all layers or the number of initial layers to freeze.
+        use_only_n_layers: Whether to limit the transferred network to a number of layers.
+
+    Attributes:
+        input_shape: Configured input image shape.
+        include_top: Whether the original classification head is included.
+        weights: Configured pretrained weight source.
+        freeze: Layer-freezing configuration.
+        use_only_n_layers: Layer-truncation configuration.
+    """
 
     def __init__(self,
                  input_shape: tuple[int, int, int] = (-1,-1,-1),
@@ -19,7 +41,6 @@ class FlashTransferLearning:
                  freeze: bool | int = False,
                  use_only_n_layers: bool | int = False
                  ) -> None:
-        
         self.input_shape: tuple[int, int, int] = input_shape
         self.include_top: bool = include_top
         self.weights: str = weights
@@ -27,6 +48,10 @@ class FlashTransferLearning:
         self.use_only_n_layers: bool | int = use_only_n_layers
 
     def _dropLayers(self, model: Sequential) -> Sequential:
+        """Keep only the requested number of layers when truncation is enabled.
+
+        `Flash Explanation:` *`Use this internal helper to create a smaller transferable feature extractor.`*
+        """
         if type(self.use_only_n_layers) == int:
             if self.use_only_n_layers == 0:
                 raise ValueError(
@@ -54,6 +79,10 @@ class FlashTransferLearning:
         return new_model
     
     def _freezeLayers(self, model: Functional | Sequential) -> Sequential:
+        """Freeze all or the first configured layers and optionally truncate the model.
+
+        `Flash Explanation:` *`Use this internal helper to control fine-tuning scope for a pretrained network.`*
+        """
         if not self.freeze: return model
 
         freezed_model = model
@@ -71,6 +100,16 @@ class FlashTransferLearning:
         return self._dropLayers(freezed_model)
 
     def transferMyNet(self, path_to_trained_modelh5: str) -> Sequential:
+        """Load a saved model and prepare its layers for transfer learning.
+
+        `Flash Explanation:` *`Use this to reuse a locally trained H5 model as a feature extractor.`*
+
+        Parameters:
+            path_to_trained_modelh5: Path to the saved Keras model file.
+
+        Returns:
+            Sequential: A sequential model prepared for transfer learning.
+        """
         model = keras.models.load_model(path_to_trained_modelh5)
 
         new_model = Sequential()
@@ -90,6 +129,19 @@ class FlashTransferLearning:
         return self._freezeLayers(new_model)
 
     def transferResnet50(self) -> FlashNet:
+        """Create a ResNet50 transfer-learning network.
+
+        `Flash Explanation:` *`Use this to obtain an ImageNet-backed ResNet50 with the configured freezing policy.`*
+
+        Parameters:
+            None.
+
+        Returns:
+            FlashNet: The ResNet50 network and its full-network status.
+
+        Raises:
+            ValueError: If ``use_only_n_layers`` is configured as an integer.
+        """
         if type(self.use_only_n_layers) == int:
             raise ValueError(
                 "ResNet can not have 'use_only_n_layers' attribute as int, use the default value (False)."
@@ -116,6 +168,19 @@ class FlashTransferLearning:
         return FlashNet(feature_extractor, False)
     
     def transferMobileNet(self) -> FlashNet:
+        """Create a MobileNet transfer-learning network.
+
+        `Flash Explanation:` *`Use this for a lightweight pretrained convolutional backbone.`*
+
+        Parameters:
+            None.
+
+        Returns:
+            FlashNet: The MobileNet network and its full-network status.
+
+        Raises:
+            ValueError: If the freeze or truncation limit exceeds the network depth.
+        """
         num_layers = len(MobileNet(include_top=False).layers)
         if type(self.use_only_n_layers) == int:
             if int(self.use_only_n_layers) > num_layers:
@@ -142,6 +207,19 @@ class FlashTransferLearning:
         return FlashNet(self._freezeLayers(feature_extractor), False)
     
     def transferXception(self) -> FlashNet:
+        """Create an Xception transfer-learning network.
+
+        `Flash Explanation:` *`Use this to obtain an Xception backbone with the configured freezing policy.`*
+
+        Parameters:
+            None.
+
+        Returns:
+            FlashNet: The Xception network and its full-network status.
+
+        Raises:
+            ValueError: If the freeze or truncation limit exceeds the network depth.
+        """
         num_layers = len(Xception(include_top=False).layers)
         if type(self.use_only_n_layers) == int:
             if int(self.use_only_n_layers) > num_layers:
@@ -168,6 +246,19 @@ class FlashTransferLearning:
         return FlashNet(self._freezeLayers(feature_extractor), False)
     
     def transferVGG16(self) -> FlashNet:
+        """Create a VGG16 transfer-learning network.
+
+        `Flash Explanation:` *`Use this to obtain a VGG16 backbone with the configured freezing policy.`*
+
+        Parameters:
+            None.
+
+        Returns:
+            FlashNet: The VGG16 network and its full-network status.
+
+        Raises:
+            ValueError: If the freeze or truncation limit exceeds the network depth.
+        """
         num_layers = len(VGG16(include_top=False).layers)
         if type(self.use_only_n_layers) == int:
             if int(self.use_only_n_layers) > num_layers:

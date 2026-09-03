@@ -4,6 +4,8 @@ from sklearn.datasets import load_breast_cancer, load_diabetes, load_iris, load_
 def boston_housing_load_data(test_split: float = 0.2):
     """Loads the Boston Housing dataset.
 
+    `Flash Explanation:` *`Use this convenience loader for a regression dataset with a configurable test fraction.`*
+
     This is a dataset taken from the StatLib library which is maintained at
     Carnegie Mellon University.
 

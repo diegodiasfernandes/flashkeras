@@ -24,6 +24,8 @@ __all__ = ["list_notebooks", "describe", "new_notebook"]
 def list_notebooks(tag: str | None = None) -> dict[str, dict]:
     """
     Return the catalog of available notebooks, keyed by name.
+    
+    `Flash Explanation:` *`Use this to discover available notebook templates before generating one.`*
 
     Args:
         tag: If given, only return notebooks that include this tag
@@ -35,7 +37,10 @@ def list_notebooks(tag: str | None = None) -> dict[str, dict]:
 
 
 def describe(name: str) -> dict:
-    """Return the catalog entry for a single notebook by name."""
+    """Return the catalog entry for a single notebook by name.
+
+    `Flash Explanation:` *`Use this to inspect one template's metadata before creating it.`*
+    """
     if name not in NOTEBOOKS:
         available = ", ".join(sorted(NOTEBOOKS))
         raise ValueError(
@@ -53,6 +58,8 @@ def new_notebook(
 ) -> Path:
     """
     Copy a notebook template into the user's project.
+
+    `Flash Explanation:` *`Use this to copy a ready-made notebook into a project with optional parameter substitution.`*
 
     Args:
         name: Notebook key, e.g. "eda_dataframe" (see list_notebooks()).
@@ -109,6 +116,8 @@ def _inject_params(nb: dict, params: dict[str, Any], notebook_name: str) -> None
     into
         csv_path = "data.csv"
     for every key present in `params`.
+
+    `Flash Explanation:` *`Use this internal helper to customize generated notebook parameters in place.`*
     """
     params_cell = next(
         (

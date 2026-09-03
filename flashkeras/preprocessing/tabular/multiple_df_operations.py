@@ -84,6 +84,10 @@ def stackDataFrames(
 
     
     def to_2d_array(data):
+        """Convert a supported tabular value to a two-dimensional array.
+
+        `Flash Explanation:` *`Use this internal helper to normalize input shapes before concatenation.`*
+        """
         if isinstance(data, pd.DataFrame):
             return data.values
         elif isinstance(data, pd.Series):

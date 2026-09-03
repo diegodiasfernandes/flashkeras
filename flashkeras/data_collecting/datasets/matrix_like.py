@@ -3,6 +3,8 @@ from keras.datasets import reuters, imdb  # type: ignore
 def load_imdb():
     """Loads the [IMDB dataset](https://ai.stanford.edu/~amaas/data/sentiment/).
 
+    `Flash Explanation:` *`Use this to retrieve integer-encoded movie-review sentiment data.`*
+
     This is a dataset of 25,000 movies reviews from IMDB, labeled by sentiment
     (positive/negative). Reviews have been preprocessed, and each review is
     encoded as a list of word indexes (integers).
@@ -63,6 +65,8 @@ def load_imdb():
 def imdb_get_world_index():
     """Retrieves a dict mapping words to their index in the IMDB dataset.
 
+    `Flash Explanation:` *`Use this to decode IMDB integer word sequences into text.`*
+
     Args:
         path: where to cache the data (relative to `~/.keras/dataset`).
 
@@ -100,6 +104,8 @@ def imdb_get_world_index():
 def reuters_get_label_names():
     """Returns labels as a list of strings with indices matching training data.
 
+    `Flash Explanation:` *`Use this to map Reuters class IDs to readable topic names.`*
+
     Reference:
 
     - [Reuters Dataset](https://martin-thoma.com/nlp-reuters/)
@@ -108,6 +114,8 @@ def reuters_get_label_names():
 
 def reuters_get_word_index():
     """Retrieves a dict mapping words to their index in the Reuters dataset.
+
+    `Flash Explanation:` *`Use this to decode Reuters integer word sequences.`*
 
     Actual word indices starts from 3, with 3 indices reserved for:
     0 (padding), 1 (start), 2 (oov).
@@ -128,6 +136,8 @@ def reuters_get_word_index():
 
 def load_reuters(test_split: float = 0.2):
     """Loads the Reuters newswire classification dataset.
+
+    `Flash Explanation:` *`Use this to retrieve topic-labeled newswire sequences with a test split.`*
 
     This is a dataset of 11,228 newswires from Reuters, labeled over 46 topics.
 

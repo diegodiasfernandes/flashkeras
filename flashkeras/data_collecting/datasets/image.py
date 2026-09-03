@@ -4,6 +4,8 @@ from sklearn.datasets import load_digits # type: ignore
 def load_cifar10():
     """Loads the CIFAR10 dataset.
 
+  `Flash Explanation:` *`Use this to retrieve the standard 10-class color image benchmark.`*
+
     This is a dataset of 50,000 32x32 color training images and 10,000 test
     images, labeled over 10 categories. See more info at the
     [CIFAR homepage](https://www.cs.toronto.edu/~kriz/cifar.html).
@@ -55,6 +57,8 @@ def load_cifar10():
 def load_cifar100():
     """Loads the CIFAR100 dataset.
 
+  `Flash Explanation:` *`Use this to retrieve the 100-class fine/coarse image benchmark.`*
+
     This is a dataset of 50,000 32x32 color training images and
     10,000 test images, labeled over 100 fine-grained classes that are
     grouped into 20 coarse-grained classes. See more info at the
@@ -96,6 +100,8 @@ def load_cifar100():
 
 def load_fashion_mnist():
     """Loads the Fashion-MNIST dataset.
+
+  `Flash Explanation:` *`Use this to retrieve labeled grayscale clothing images.`*
     This is a dataset of 60,000 28x28 grayscale images of 10 fashion categories,
     along with a test set of 10,000 images. This dataset can be used as
     a drop-in replacement for MNIST.
@@ -139,6 +145,8 @@ def load_fashion_mnist():
 
 def load_mnist():
     """Loads the MNIST dataset.
+
+  `Flash Explanation:` *`Use this to retrieve the standard handwritten-digit benchmark.`*
 
     This is a dataset of 60,000 28x28 grayscale images of the 10 digits,
     along with a test set of 10,000 images.

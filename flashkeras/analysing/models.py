@@ -1,6 +1,10 @@
 from flashkeras.utils.kerasimports import Sequential
 
 def print_model_summary(model: Sequential):
+    """Print the Keras summary for a sequential model.
+
+    `Flash Explanation:` *`Use this to inspect model layers, output shapes, and parameter counts.`*
+    """
     # Header
     print(f"{'Index':<5} | {'Layer Type':<24} {'(trainable)':<11} | Configuration")
     print("-" * 80)

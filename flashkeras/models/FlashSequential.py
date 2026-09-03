@@ -8,6 +8,22 @@ from flashkeras.utils.typehints import *
 tasks_available = Literal['classification', 'regression']
 
 class FlashSequential:
+    """Build and manage a task-oriented Keras sequential model.
+
+    `Flash Explanation:` *`Use this class to assemble, configure, train, evaluate, and reuse sequential Keras models with automatic task-specific output settings.`*
+
+    Parameters:
+        task: Model task, either ``"classification"`` or ``"regression"``.
+
+    Attributes:
+        model: Wrapped Keras ``Sequential`` model.
+        layers: Current list of layers in the wrapped model.
+        blocked: Messages describing why architecture modifications are blocked.
+        output_activation: Activation selected for the inferred output layer.
+        output_loss: Loss selected for the inferred task.
+        output_neurons: Number of units selected for the output layer.
+    """
+
     def __init__(self, task: Literal['classification', 'regression']) -> None:
         self.task: Literal['classification', 'regression'] = task
 
@@ -23,6 +39,19 @@ class FlashSequential:
         self.metrics: Any = None       
 
     def add(self, layer) -> None:       
+        """Append a Keras layer to the model.
+
+        `Flash Explanation:` *`Use this to add any compatible custom or keras-built-in layer before the model is blocked.`*
+        
+        Parameters:
+            layer: Keras layer instance to append to the model.
+        
+        Returns:
+            None. Updates the wrapped model architecture.
+        
+        Raises:
+            ValueError: If architecture modifications are currently blocked.
+        """
         self._checkBlocked()
 
         self.model.add(layer)
@@ -44,6 +73,20 @@ class FlashSequential:
             "swish",
         ] = 'relu'
     ) -> None:       
+        """Append a dense layer with the requested width and activation.
+
+        `Flash Explanation:` *`Use this to add a fully connected layer without constructing ``Dense`` manually.`*
+        
+            Parameters:
+                num_neurons: Number of units in the dense layer.
+                activation: Activation function applied by the layer.
+        
+            Returns:
+                None. Appends the dense layer to the wrapped model.
+        
+            Raises:
+                ValueError: If architecture modifications are currently blocked.
+        """
         self._checkBlocked()
 
         self.model.add(Dense(
@@ -54,6 +97,19 @@ class FlashSequential:
         self.layers = self.model.layers
 
     def addFlatten(self) -> None:       
+        """Append a flattening layer to the model.
+
+        `Flash Explanation:` *`Use this to convert spatial feature maps into a vector for dense layers.`*
+
+        Parameters:
+            None.
+        
+        Returns:
+            None. Appends a Keras ``Flatten`` layer to the wrapped model.
+        
+        Raises:
+            ValueError: If architecture modifications are currently blocked.
+        """
         self._checkBlocked()
 
         self.model.add(Flatten())
@@ -63,6 +119,17 @@ class FlashSequential:
     def addTransferLearning(self, transferLayer: FlashNet) -> None: 
         '''
             Adds transfer learning layers created with FlashTransferLearning
+
+            `Flash Explanation:` *`Use this to attach a pretrained feature extractor or full network.`*
+            
+            Parameters:
+                transferLayer: Transfer-learning network created by ``FlashTransferLearning``.
+            
+            Returns:
+                None. Adds the transfer-learning network to the wrapped model.
+            
+            Raises:
+                ValueError: If architecture modifications are currently blocked.
         '''
 
         self._checkBlocked()
@@ -82,6 +149,19 @@ class FlashSequential:
                 loss: Any | None = None,
                 metrics: Any = None,
                 ) -> None:
+        """Compile the wrapped Keras model with an optimizer, loss, and metrics.
+
+        `Flash Explanation:` *`Use this to configure training; string optimizers are mapped to Keras optimizers.`*
+        
+        Parameters:
+            optimizer: Optimizer name or configured optimizer instance.
+            learning_rate: Optional learning rate used for named optimizers.
+            loss: Loss function or loss name passed to Keras.
+            metrics: Metrics passed to Keras; defaults depend on the task.
+        
+        Returns:
+            None. Compiles the wrapped model and stores optimizer and metric settings.
+        """
 
         if metrics is None:
             if self.task == 'classification':
@@ -105,6 +185,16 @@ class FlashSequential:
               auto_output_layer: bool = True
               ) -> None:
         ''' Automatically sets the `input_shape` and `output_layer` based on your data
+
+          `Flash Explanation:` *`Use this to infer input and output configuration from representative data.`*
+          
+                    Parameters:
+                            data: Representative input data or a Keras batch iterator.
+                            y: Optional target labels used to infer output configuration.
+                            auto_output_layer: Whether to append the inferred output layer.
+          
+                    Returns:
+                            None. Configures the input shape and, optionally, the output layer.
         '''
         self._setOutputParams(y, data)
 
@@ -134,6 +224,29 @@ class FlashSequential:
             sample_weight: Any | None = None,
             initial_epoch: int = 0
             ) -> Any:
+        """Build, compile, and train the wrapped model.
+
+        `Flash Explanation:` *`Use this as the main training entry point for arrays, data frames, or iterators.`*
+        
+        Parameters:
+            x: Training inputs or a Keras batch iterator.
+            y: Training targets when ``x`` is array-like.
+            epochs: Number of training epochs.
+            auto_output_layer: Whether to add an inferred output layer before training.
+            validation_data: Data used for validation during training.
+            steps_per_epoch: Number of batches per training epoch.
+            batch_size: Number of samples per batch for array-like inputs.
+            verbose: Keras training verbosity setting.
+            callbacks: Keras callbacks used during training.
+            validation_split: Fraction of array-like data reserved for validation.
+            shuffle: Whether to shuffle training data.
+            class_weight: Optional class weights for classification.
+            sample_weight: Optional per-sample weights.
+            initial_epoch: Epoch from which to resume training.
+        
+        Returns:
+            Any: Keras ``History`` object containing training results.
+        """
         
         self.build(x, y, auto_output_layer)
 
@@ -172,10 +285,33 @@ class FlashSequential:
                 # workers: int = 1,
                 # use_multiprocessing: bool = False
                 ) -> Any:
+        """Generate predictions for a batch of inputs.
+
+        `Flash Explanation:` *`Use this to run the wrapped Keras model on arrays or iterators.`*
+        
+                Parameters:
+                    x: Input samples, arrays, data frames, or a Keras iterator.
+                    batch_size: Number of samples processed per prediction batch.
+                    verbose: Keras prediction verbosity setting.
+                    steps: Number of batches to process from an iterator.
+        
+                Returns:
+                    Any: Predictions generated by the wrapped Keras model.
+        """
         
         return self.model.predict(x=x, batch_size=batch_size, verbose=verbose, steps=steps)
 
     def singlePredict(self, instance: Any):
+        """Generate a prediction for one tabular or image instance.
+
+        `Flash Explanation:` *`Use this to normalize one input's batch shape before prediction.`*
+        
+        Parameters:
+            instance: One tabular or image sample to predict.
+        
+        Returns:
+            np.ndarray: The predicted class or regression value for the sample.
+        """
         if isinstance(instance, np.ndarray):
             if len(instance.shape) == 2:
                 instance = np.expand_dims(instance, axis=-1)
@@ -200,6 +336,16 @@ class FlashSequential:
         return prediction
 
     def summary(self):
+        """Print the model architecture summary.
+
+        `Flash Explanation:` *`Use this to inspect the model even before it has been fully built.`*
+
+        Parameters:
+            None.
+
+        Returns:
+            None. Prints the model architecture summary.
+        """
         try:
             self.model.summary()
         except:
@@ -207,11 +353,31 @@ class FlashSequential:
             print_model_summary(self.model)
 
     def loadModel(self, path_to_modelh5: str):
+        """Load a saved Keras model and block unsafe architecture edits.
+
+        `Flash Explanation:` *`Use this to restore a trained model from an H5-compatible path.`*
+        
+        Parameters:
+            path_to_modelh5: Path to the saved Keras model file.
+        
+        Returns:
+            None. Replaces the wrapped model and blocks architecture edits.
+        """
         print("This will Overwrite an existent model.")
         self.model = keras.models.load_model(path_to_modelh5)
         self.blocked.append('Loaded Model: You have loaded a full model. To maintain integrity of the flash, any modifications to the architecture are blocked.')
 
     def setInputShape(self, input_shape: tuple):
+        """Recreate the sequential model with an explicit input shape.
+
+        `Flash Explanation:` *`Use this to establish the input layer before adding existing layers.`*
+        
+        Parameters:
+            input_shape: Shape of one input sample, excluding the batch dimension.
+        
+        Returns:
+            None. Rebuilds the wrapped sequential model with an input layer.
+        """
         new_model: Sequential = Sequential(InputLayer(input_shape=input_shape))
         for layer in self.model.layers: 
             new_model.add(layer)
@@ -220,12 +386,31 @@ class FlashSequential:
     def clearFlash(self) -> None:
         '''
             Reset every configuration made on flash model.
+
+            `Flash Explanation:` *`Use this to discard the current architecture and unblock the wrapper.`*
+
+            Parameters:
+                None.
+            
+            Returns:
+                None. Resets the model architecture and blocked state.
         '''
         self.model = Sequential()
         self.layers = self.model.layers
         self.blocked = []
 
     def _optimizerMap(self, opt: str, lr: Optional[float]):
+        """Map a supported optimizer name and learning rate to a Keras optimizer.
+
+        `Flash Explanation:` *`Use this internal helper to turn user-friendly optimizer options into instances.`*
+        
+        Parameters:
+            opt: Optimizer name, such as ``"adam"``, ``"nadam"``, or ``"sgd"``.
+            lr: Optional learning rate; defaults to ``0.0001`` when omitted.
+        
+        Returns:
+            Any: Configured Keras optimizer instance.
+        """
         if lr is None:
             lr = 0.0001
         if opt == "adam":
@@ -238,6 +423,16 @@ class FlashSequential:
             return Adam()
         
     def _array_of_unit_arrays(self, arr: np.ndarray | pd.Series) -> bool:
+        """Return whether every nested label array contains one value.
+
+        `Flash Explanation:` *`Use this internal helper to distinguish sparse labels from one-hot labels.`*
+        
+        Parameters:
+            arr: Array or Series containing nested label values.
+        
+        Returns:
+            bool: ``True`` when every nested value contains one item.
+        """
         for subarray in arr:
             if subarray.size != 1:
                 return False
@@ -247,6 +442,20 @@ class FlashSequential:
                 y: Union[np.ndarray, pd.DataFrame, pd.Series, None] = None, 
                 image_batches: Optional[BatchIterator] = None, 
                 ) -> None:
+        """Infer output activation, loss, and neuron count from the task labels.
+
+        `Flash Explanation:` *`Use this internal helper before building a task-compatible output layer.`*
+        
+        Parameters:
+            y: Optional tabular labels used to infer output settings.
+            image_batches: Optional Keras iterator containing labels.
+        
+        Returns:
+            None. Updates output activation, loss, and neuron count attributes.
+        
+        Raises:
+            ValueError: If required labels or input metadata are unavailable.
+        """
         
         if self.task == 'classification':
             sparse_or_not: str = ""
@@ -299,6 +508,19 @@ class FlashSequential:
             self.output_loss = 'mse'
 
     def _checkBlocked(self) -> None:
+        """Raise an error when model mutation has been blocked by a full model load.
+
+        `Flash Explanation:` *`Use this internal guard to preserve the integrity of protected architectures.`*
+
+        Parameters:
+            None.
+        
+        Returns:
+            None when architecture edits are allowed.
+        
+        Raises:
+            ValueError: If the model is protected from architecture changes.
+        """
         if len(self.blocked) != 0:
             err_message = 'Possible errors:\n'
             for error in self.blocked:
