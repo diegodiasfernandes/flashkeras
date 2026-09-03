@@ -96,6 +96,48 @@ class FlashSequential:
         
         self.layers = self.model.layers
 
+    def addConvolution2D(
+        self,
+        filters: int,
+        kernel_size: int | tuple[int, int] = (3, 3),
+        activation: Literal[
+            "relu",
+            "sigmoid",
+            "tanh",
+            "softmax",
+            "linear",
+            "elu",
+            "selu",
+            "gelu",
+            "swish",
+        ] = 'relu'
+    ) -> None:
+        """Append a two-dimensional convolutional layer.
+
+        `Flash Explanation:` *`Use this to extract spatial features from image data before pooling, flattening, or dense layers.`*
+
+        Parameters:
+            filters: Number of convolution filters, also called output channels.
+            kernel_size: Height and width of the convolution window. An integer
+                creates a square window; a tuple can specify both dimensions.
+            activation: Activation function applied by the layer.
+
+        Returns:
+            None. Appends a Keras ``Conv2D`` layer to the wrapped model.
+
+        Raises:
+            ValueError: If architecture modifications are currently blocked.
+        """
+        self._checkBlocked()
+
+        self.model.add(Conv2D(
+            filters,
+            kernel_size,
+            activation=activation
+        ))
+
+        self.layers = self.model.layers
+
     def addFlatten(self) -> None:       
         """Append a flattening layer to the model.
 
