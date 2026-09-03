@@ -52,23 +52,26 @@ This package depends on:
 ## Quick start
 
 ```python
-from flashkeras import FlashSequential, FlashPreProcessing, FlashDataGenerator
+from flashkeras import FlashSequential
+from flashkeras.data_collecting import load_mnist
+from flashkeras.preprocessing import preprocess_images_from_nparray
 
 # Example dataset
-# (x_train, y_train), (x_test, y_test) = keras.datasets.mnist.load_data()
+(x_train, y_train), (x_test, y_test) = load_mnist()
 
 # Preprocessing
-x_train = x_train.astype("float32") / 255.0
-x_test = x_test.astype("float32") / 255.0
-
 # Image augmentation / pipeline utilities
-img_gen = FlashDataGenerator(
+train_batches = preprocess_images_from_nparray(
+    x_train,
+    y_train,
     img_shape=(28, 28),
     rotation_range=10,
 )
-
-train_batches = img_gen.preprocess_images_from_nparray(x_train, y_train)
-test_batches = img_gen.preprocess_images_from_nparray(x_test, y_test)
+test_batches = preprocess_images_from_nparray(
+    x_test,
+    y_test,
+    img_shape=(28, 28),
+)
 
 # Model creation
 model = FlashSequential("classification")
@@ -95,10 +98,13 @@ print(acc, recall)
 Utilities to work with datasets and image sources in a simple way.
 
 ```python
-from flashkeras.data_collecting import FlashDataGenerator
+from flashkeras.data_collecting import load_all_classes_from_directory_and_preprocess
 
 # Example: loading batches from directory or array
-image_generator = FlashDataGenerator(img_shape=(32, 32))
+image_batches = load_all_classes_from_directory_and_preprocess(
+    "path/to/dataset",
+    img_shape=(32, 32),
+)
 ```
 
 ### 2) Analysis and visualization
