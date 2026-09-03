@@ -210,6 +210,9 @@ class FlashSequential:
                 metrics = ['accuracy']
             elif self.task == 'regression':
                 metrics = ['mae']
+
+        if self.task == 'regression' and learning_rate is None:
+            learning_rate = 0.001
         
         if isinstance(optimizer, str):
             opt = self._optimizerMap(optimizer, learning_rate)
