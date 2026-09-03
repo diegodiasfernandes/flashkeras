@@ -230,16 +230,6 @@ predictions = model.predict(x_test)
 one_prediction = model.singlePredict(x_test[0])
 ```
 
-For manual control over the configuration, use `build()` and `compile()` before calling Keras directly or starting training:
-
-```python
-model = FlashSequential("regression")
-model.addDense(64, "relu")
-model.build(x_train, y_train, auto_output_layer=True)
-model.compile(optimizer="adam", loss="mse", metrics=["mae"])
-history = model.model.fit(x_train, y_train, epochs=10)
-```
-
 | Situation | Recommended structure | Notes |
 | --- | --- | --- |
 | Tabular data | `Dense -> Dense -> output` | Each sample is already a feature vector. |
