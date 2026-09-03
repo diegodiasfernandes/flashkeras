@@ -43,6 +43,37 @@ NOTEBOOKS = {
             "epochs": "Number of training epochs.",
         },
     },
+    "image_classification_validation": {
+        "title": "Image Classification Validation",
+        "description": (
+            "Evaluates a FlashSequential image classifier against a validation "
+            "directory or an iterator created by an earlier training notebook."
+        ),
+        "filename": "image_classification_validation.ipynb",
+        "tags": ["cv", "keras", "classification", "images", "evaluation"],
+        "parameters": {
+            "model_path": "Optional path to a saved Keras model.",
+            "validation_dir": "Optional directory with one subfolder per class.",
+            "image_size": "Target (height, width) for resizing images.",
+            "batch_size": "Validation batch size.",
+            "color_mode": "Image color mode (rgb or grayscale).",
+        },
+    },
+    "dataframe_classification_validation": {
+        "title": "DataFrame Classification Validation",
+        "description": (
+            "Evaluates a FlashSequential DataFrame classifier against a labeled "
+            "validation CSV or arrays created by an earlier training notebook."
+        ),
+        "filename": "dataframe_classification_validation.ipynb",
+        "tags": ["keras", "classification", "tabular", "evaluation"],
+        "parameters": {
+            "model_path": "Optional path to a saved Keras model.",
+            "validation_csv": "Optional CSV containing validation features and target.",
+            "target_column": "Target column in the validation CSV.",
+            "separator": "CSV delimiter (default ',').",
+        },
+    },
     "text_classification_baseline": {
         "title": "Text Classification Baseline",
         "description": (

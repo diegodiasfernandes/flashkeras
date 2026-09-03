@@ -130,6 +130,12 @@ def _inject_params(nb: dict, params: dict[str, Any], notebook_name: str) -> None
     )
 
     if params_cell is None:
+        params_cell = next(
+            (c for c in nb["cells"] if c.get("cell_type") == "code"),
+            None,
+        )
+
+    if params_cell is None:
         print(
             f"Warning: notebook '{notebook_name}' has no parameters cell; "
             "params were not applied."
