@@ -15,8 +15,8 @@ from .datasets import (
     reuters_get_word_index,
     reuters_get_label_names,
 )
-from pandas import read_csv, read_parquet
-from .images import (
+from .local_data import read_csv, read_parquet
+from .local_data.images import (
     load_all_classes_from_directory_and_preprocess,
     load_all_classes_from_directory_and_preprocess_test_split,
     load_classes_from_directory_and_preprocess,
