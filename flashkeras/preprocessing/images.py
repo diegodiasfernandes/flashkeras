@@ -7,7 +7,116 @@ import numpy as np
 from flashkeras.utils.otherimports import *
 from flashkeras.utils.kerasimports import *
 from flashkeras.utils.typehints import *
-from flashkeras.preprocessing.FlashPreProcessing import FlashPreProcessing as prepro
+from flashkeras.preprocessing.tabular.encoding import ensureOneHotEncoding
+
+
+def convertNumpyNdArrayToGrayScale(images: np.ndarray) -> np.ndarray:
+    """
+    Converts a batch of RGB images into grayscale.
+
+    `Flash Explanation:` *`Use this to convert RGB images into grayscale format!`*
+
+    This function checks if the last dimension is already grayscale
+    (single channel). If not, it computes the grayscale intensity
+    using the luminance-preserving formula with weights for red,
+    green, and blue channels.
+
+    Parameters:
+        images : np.ndarray
+            A NumPy array of images with shape (n_samples, height, width, channels).
+            Channels can be 1 (grayscale) or 3 (RGB).
+
+    Returns:
+        np.ndarray
+            Grayscale images with shape (n_samples, height, width, 1).
+    """
+    if images.shape[-1] == 1:
+        return images
+    grayscale_images = np.dot(images[..., :3], [0.2989, 0.5870, 0.1140])
+    return np.expand_dims(grayscale_images, axis=-1)
+
+
+def resizeNpArray(array: np.ndarray, new_height: int, new_width: int) -> np.ndarray:
+    """
+    Resizes a NumPy image array to new dimensions.
+
+    `Flash Explanation:` *`Use this when you want to resize images (grayscale or RGB) to a new shape before feeding them into a model!`*
+
+    If the input already matches the target size, it is returned unchanged.
+    Handles both grayscale and RGB inputs, automatically expanding dimensions
+    when necessary for compatibility. Uses TensorFlow's `tf.image.resize`
+    for resizing.
+
+    Parameters:
+        array : np.ndarray
+            Input array with shape (n_samples, height, width, channels) or
+            (n_samples, height, width).
+        new_height : int
+            Target height of the output images.
+        new_width : int
+            Target width of the output images.
+
+    Returns:
+        np.ndarray
+            The resized array with shape (n_samples, new_height, new_width, channels).
+    """
+    if array.shape[1:3] == (new_height, new_width):
+        return array
+    if len(array.shape) == 3:
+        array = np.expand_dims(array, axis=-1)
+    return tf.image.resize(array, (new_height, new_width)).numpy()
+
+
+def convertNumpyNdArrayToRGB(images: np.ndarray) -> np.ndarray:
+    """
+    Converts grayscale images into RGB by repeating the channel.
+
+    `Flash Explanation:` *`Use this when you have grayscale images and need them in
+    RGB format for models or libraries that expect 3 channels!`*
+
+    If the input already has 3 channels, it is returned unchanged.
+    Otherwise, the grayscale channel is expanded and repeated across
+    the three RGB channels.
+
+    Parameters:
+        images : np.ndarray
+            A NumPy array of images with shape (n_samples, height, width, channels).
+            Can be grayscale (1 channel) or RGB (3 channels).
+
+    Returns:
+        np.ndarray
+            RGB images with shape (n_samples, height, width, 3).
+    """
+    if images.shape[-1] == 3:
+        return images
+    if len(images.shape) == 3:
+        images = np.expand_dims(images, axis=-1)
+    return np.repeat(images, 3, axis=-1)
+
+
+def normalize_pixels(img_arr_data: np.ndarray) -> np.ndarray:
+    """
+    Normalize images loaded in a numpy array to [0, 1] dividing the pixel's values by 255.0.
+
+    `Flash Explanation:` *`Use this to keep the pixels between (0, 1)!`*
+
+    Parameters
+        img_arr_data: np.ndarray
+        Array of images with shape (n_samples, height, width, channels) or (n_samples, height, width).
+
+    Returns
+        np.ndarray
+        Preprocessed array with shape (n_samples, height * width * channels).
+    """
+    if img_arr_data.ndim == 3:
+        n_samples, height, width = img_arr_data.shape
+        img_arr_data = img_arr_data.reshape((n_samples, height * width))
+    elif img_arr_data.ndim == 4:
+        n_samples, height, width, channels = img_arr_data.shape
+        img_arr_data = img_arr_data.reshape((n_samples, height * width * channels))
+    else:
+        raise ValueError("Unsupported input array shape.")
+    return img_arr_data.astype('float32') / 255.0
 
 
 def preprocess_images_from_nparray(
@@ -48,16 +157,16 @@ def preprocess_images_from_nparray(
             raise ValueError("Input array 'x' must have at least 3 dimensions to automatically extract shape.")
 
     if color_mode == "rgb":
-            x = prepro.convertNumpyNdArrayToRGB(x)
+            x = convertNumpyNdArrayToRGB(x)
     elif color_mode == "grayscale":
         if x.ndim == 3:
             x = np.expand_dims(x, axis=-1)
-        x = prepro.convertNumpyNdArrayToGrayScale(x)
+        x = convertNumpyNdArrayToGrayScale(x)
     else:
         if x.ndim == 3:
             x = np.expand_dims(x, axis=-1)
-            
-    x = prepro.resizeNpArray(x, img_shape[0], img_shape[1])
+
+    x = resizeNpArray(x, img_shape[0], img_shape[1])
 
     rescale_val = 1.0 / 255 if np.max(x) > 1.0 else None
 
@@ -114,17 +223,17 @@ def preprocess_images_from_nparray_test_split(
             raise ValueError("Input array 'x' must have at least 3 dimensions to automatically extract shape.")
 
     if color_mode == "rgb":
-            x = prepro.convertNumpyNdArrayToRGB(x)
+            x = convertNumpyNdArrayToRGB(x)
     elif color_mode == "grayscale":
         if x.ndim == 3:
             x = np.expand_dims(x, axis=-1)
-        x = prepro.convertNumpyNdArrayToGrayScale(x)
+        x = convertNumpyNdArrayToGrayScale(x)
     else:
         if x.ndim == 3:
             x = np.expand_dims(x, axis=-1)
 
-    x = prepro.resizeNpArray(x, img_shape[0], img_shape[1])
-    y = prepro.ensureOneHotEncoding(y)
+    x = resizeNpArray(x, img_shape[0], img_shape[1])
+    y = ensureOneHotEncoding(y)
 
     rescale_val = 1.0 / 255 if np.max(x) > 1.0 else None
 
@@ -145,43 +254,43 @@ def preprocess_images_from_nparray_test_split(
 
 
 def stackImageDatasets(
-        data_a: np.ndarray | Tuple[np.ndarray, np.ndarray], 
+        data_a: np.ndarray | Tuple[np.ndarray, np.ndarray],
         data_b: np.ndarray | Tuple[np.ndarray, np.ndarray]
     ) -> np.ndarray | Tuple[np.ndarray, np.ndarray]:
-    
-    """
-    Stacks two image datasets vertically (concatenating along the first axis), 
-    supporting both raw NumPy image arrays and `(images, labels)` dataset tuples.  
 
-    `Flash Explanation:` *`Use this when you want to merge two batches or datasets of images 
-    (with or without labels) into one continuous dataset, keeping everything aligned!`*  
-    This function ensures that input shapes match (except for the first dimension), 
-    then concatenates them row-wise. If labels are provided, they are also stacked 
-    consistently with their corresponding images.  
+    """
+    Stacks two image datasets vertically (concatenating along the first axis),
+    supporting both raw NumPy image arrays and `(images, labels)` dataset tuples.
+
+    `Flash Explanation:` *`Use this when you want to merge two batches or datasets of images
+    (with or without labels) into one continuous dataset, keeping everything aligned!`*
+    This function ensures that input shapes match (except for the first dimension),
+    then concatenates them row-wise. If labels are provided, they are also stacked
+    consistently with their corresponding images.
 
     Parameters:
-        data_a: np.ndarray | Tuple[np.ndarray, np.ndarray]  
-            The first dataset. Can be:  
-            - A NumPy array of images with shape `(n_samples, height, width, channels)`  
-            - A tuple `(images, labels)`, where `images` and `labels` are both NumPy arrays.  
+        data_a: np.ndarray | Tuple[np.ndarray, np.ndarray]
+            The first dataset. Can be:
+            - A NumPy array of images with shape `(n_samples, height, width, channels)`
+            - A tuple `(images, labels)`, where `images` and `labels` are both NumPy arrays.
 
-        data_b: np.ndarray | Tuple[np.ndarray, np.ndarray]  
-            The second dataset. Must be of the same type and structure as `data_a`.  
+        data_b: np.ndarray | Tuple[np.ndarray, np.ndarray]
+            The second dataset. Must be of the same type and structure as `data_a`.
 
     Returns:
-        np.ndarray | Tuple[np.ndarray, np.ndarray]  
-            - If both inputs are `np.ndarray`: returns a concatenated image array.  
-            - If both inputs are `(images, labels)` tuples: returns a new tuple with 
-            stacked images and labels.  
+        np.ndarray | Tuple[np.ndarray, np.ndarray]
+            - If both inputs are `np.ndarray`: returns a concatenated image array.
+            - If both inputs are `(images, labels)` tuples: returns a new tuple with
+            stacked images and labels.
 
     Raises:
-        ValueError:  
-            - If image shapes (beyond the first dimension) do not match.  
-            - If labels shapes (beyond the first dimension) do not match when using tuples.  
-            - If tuples do not have exactly two elements `(images, labels)`.  
+        ValueError:
+            - If image shapes (beyond the first dimension) do not match.
+            - If labels shapes (beyond the first dimension) do not match when using tuples.
+            - If tuples do not have exactly two elements `(images, labels)`.
 
-        TypeError:  
-            - If the inputs are not both arrays or both `(images, labels)` tuples.  
+        TypeError:
+            - If the inputs are not both arrays or both `(images, labels)` tuples.
 
     ---
     Examples:
@@ -201,39 +310,39 @@ def stackImageDatasets(
     >>> labels_a = np.random.randint(0, 2, (8, 1))      # binary labels
     >>> images_b = np.random.rand(4, 32, 32, 1)         # 4 grayscale images
     >>> labels_b = np.random.randint(0, 2, (4, 1))      # binary labels
-    >>> merged_images, merged_labels = stackImageDatasets((images_a, labels_a), 
+    >>> merged_images, merged_labels = stackImageDatasets((images_a, labels_a),
     ...                                                   (images_b, labels_b))
     >>> print(merged_images.shape, merged_labels.shape)
     (12, 32, 32, 1) (12, 1)
     """
-    
+
     if isinstance(data_a, np.ndarray) and isinstance(data_b, np.ndarray):
         if data_a.shape[1:] != data_b.shape[1:]:
             raise ValueError(f"Shape mismatch: data_a has shape {data_a.shape} and data_b has shape {data_b.shape}. "
                                 f"Both must have the same shape except for the first dimension.")
 
         return np.concatenate([data_a, data_b], axis=0)
-    
+
     elif isinstance(data_a, tuple) and isinstance(data_b, tuple):
         if len(data_a) != 2 or len(data_b) != 2:
             raise ValueError("Both inputs should be tuples of length 2, (images, labels).")
-        
+
         images_a, labels_a = data_a
         images_b, labels_b = data_b
-        
+
         if images_a.shape[1:] != images_b.shape[1:]:
             raise ValueError(f"Shape mismatch in images: images_a has shape {images_a.shape} and images_b has shape {images_b.shape}. "
                                 f"Both must have the same shape except for the first dimension.")
-        
+
         if labels_a.shape[1:] != labels_b.shape[1:]:
             raise ValueError(f"Shape mismatch in labels: labels_a has shape {labels_a.shape} and labels_b has shape {labels_b.shape}. "
                                 f"Both must have the same shape except for the first dimension.")
-        
+
         merged_images = np.concatenate([images_a, images_b], axis=0)
         merged_labels = np.concatenate([labels_a, labels_b], axis=0)
-        
+
         return (merged_images, merged_labels)
-    
+
     else:
         raise TypeError("Inputs must be either both ndarrays or both tuples of (images, labels).")
 
@@ -241,33 +350,33 @@ def stackImageDatasets(
 def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, NumpyArrayIterator]) -> tuple:
 
     """
-    Infers the input shape of a dataset (features-only) or iterator, supporting multiple data formats 
-    (NumPy arrays, Pandas DataFrames, and Keras data iterators).  
+    Infers the input shape of a dataset (features-only) or iterator, supporting multiple data formats
+    (NumPy arrays, Pandas DataFrames, and Keras data iterators).
 
-    `Flash Explanation:` *`Use this when you want to automatically detect the input shape 
-    of your dataset or generator! This can be placed as the input_shape parameter for all keras methods, such as Dense(input_shape=).`*  
+    `Flash Explanation:` *`Use this when you want to automatically detect the input shape
+    of your dataset or generator! This can be placed as the input_shape parameter for all keras methods, such as Dense(input_shape=).`*
 
     Parameters:
-        data: np.ndarray | pd.DataFrame | DirectoryIterator | NumpyArrayIterator  
-            The dataset or iterator whose input shape will be determined.  
-            Supported inputs:  
-            - **NumpyArrayIterator:** Returns the shape of the contained image batch 
-            (excluding the batch dimension).  
-            - **DirectoryIterator:** Returns `(height, width, 3)` assuming RGB images.  
-            - **NumPy array (1D or 2D)** or **Pandas DataFrame:** Returns `(n_features,)`, 
+        data: np.ndarray | pd.DataFrame | DirectoryIterator | NumpyArrayIterator
+            The dataset or iterator whose input shape will be determined.
+            Supported inputs:
+            - **NumpyArrayIterator:** Returns the shape of the contained image batch
+            (excluding the batch dimension).
+            - **DirectoryIterator:** Returns `(height, width, 3)` assuming RGB images.
+            - **NumPy array (1D or 2D)** or **Pandas DataFrame:** Returns `(n_features,)`,
             treating the data as tabular. Remember to drop the label column for this.
-            - **NumPy array (3D or 4D):** Returns an image-like shape, either 
-            `(height, width, 1)` for grayscale or `(height, width, 3)` for RGB.  
+            - **NumPy array (3D or 4D):** Returns an image-like shape, either
+            `(height, width, 1)` for grayscale or `(height, width, 3)` for RGB.
 
     Returns:
-        tuple  
-            A tuple describing the inferred input shape, excluding the batch dimension.  
+        tuple
+            A tuple describing the inferred input shape, excluding the batch dimension.
 
     Raises:
-        TypeError:  
-            - If `data` is not one of the supported types.  
+        TypeError:
+            - If `data` is not one of the supported types.
 
-    ---  
+    ---
     Examples:
     >>> import numpy as np
     >>> import pandas as pd
@@ -280,7 +389,7 @@ def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, Numpy
     >>> print(shape)
     (64, 64, 3)
 
-    ---  
+    ---
     #### From a DirectoryIterator
     >>> # Assuming a directory with RGB images resized to 128x128
     >>> dir_iter = DirectoryIterator("data/images", image_data_generator, target_size=(128,128))
@@ -288,21 +397,21 @@ def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, Numpy
     >>> print(shape)
     (128, 128, 3)
 
-    ---  
+    ---
     #### From a NumPy array (tabular data)
     >>> arr = np.random.rand(100, 20)  # 100 samples, 20 features
     >>> shape = MyClass.getInputShape(arr)
     >>> print(shape)
     (20,)
 
-    ---  
+    ---
     #### From a Pandas DataFrame
     >>> df = pd.DataFrame(np.random.rand(50, 10))  # 50 samples, 10 features
     >>> shape = MyClass.getInputShape(df)
     >>> print(shape)
     (10,)
 
-    ---  
+    ---
     #### From a raw NumPy image
     >>> img = np.random.rand(28, 28)   # single grayscale image
     >>> shape = MyClass.getInputShape([img])
@@ -310,7 +419,7 @@ def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, Numpy
     (28, 28, 1)
     """
 
-    
+
     if isinstance(data, NumpyArrayIterator):
         return data.x.shape[1:]
 
@@ -321,13 +430,13 @@ def getInputShape(data: Union[np.ndarray, pd.DataFrame, DirectoryIterator, Numpy
         temp_data = data
         temp_data = pd.DataFrame(temp_data)
         return (temp_data.shape[1], )
-    
+
     else:
         shape = data[0].shape
-        if len(shape) == 2: 
+        if len(shape) == 2:
             return (shape[0], shape[1], 1)
-        else: 
-            return (shape[0], shape[1], 3)   
+        else:
+            return (shape[0], shape[1], 3)
 
 
 def getImageShape(image: Union[np.ndarray, Image.Image, str]) -> Tuple[int, int]:
@@ -347,7 +456,7 @@ def getImageShape(image: Union[np.ndarray, Image.Image, str]) -> Tuple[int, int]
             return (image.shape[0], image.shape[1])
         elif image.ndim == 3:
             return (image.shape[0], image.shape[1])
-    
+
     raise ValueError("The image must be one of the following types: ``np.ndarray``, ``Image.Image`` or a ``str`` representing the path.")
 
 
