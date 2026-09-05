@@ -1,8 +1,9 @@
-from .layers import *
+from keras.layers import *  # type: ignore
+
 
 _exclude = [
-    'AvgPool1D', 
-    'AvgPool2D', 
+    'AvgPool1D',
+    'AvgPool2D',
     'AvgPool3D',
     'AbstractRNNCell',
     'ActivityRegularization',
